@@ -1,0 +1,72 @@
+<diagram program="umletino" version="15.1"><zoom_level>10</zoom_level><help_text>Space for diagram notes</help_text><element><id>UMLClass</id><coordinates><x>690</x><y>700</y><w>450</w><h>180</h></coordinates><panel_attributes>&lt;&lt;Mech&gt;&gt;
+MonoBehaviour, IControllable
+--
+COMPONENTS
+--
++ Controller
+
+--
+FIELDS
+--
+- float Health
+- ScriptableObject Mechtype
+--
+--
+METHODS
+--
+
+
+
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1220</x><y>480</y><w>490</w><h>110</h></coordinates><panel_attributes>&lt;&lt;NavClass&gt;&gt;
+--
+FIELDS
+--
+--
+METHODS
+--</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>800</x><y>320</y><w>220</w><h>130</h></coordinates><panel_attributes>&lt;&lt;Controller&gt;&gt;
+--
+FIELDS
+--
+--
+PROPERTIES
+--
++ Vec3 NextLocation()
+
+--
+METHODS
+--
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>410</x><y>480</y><w>200</w><h>170</h></coordinates><panel_attributes>&lt;&lt;MechType&gt;&gt;
+--
+COMPONENTS
+--
+--
+FIELDS
+--
++ float MaxHealth
++ float TurnVel
++ float MoveAcc
++ float MoveVelMax
+
+--
+METHODS
+--</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>680</x><y>480</y><w>220</w><h>130</h></coordinates><panel_attributes>&lt;&lt;EnemyController&gt;&gt;
+--
+FIELDS
+--
+--
+PROPERTIES
+--
+--
+METHODS
+--
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>930</x><y>480</y><w>220</w><h>150</h></coordinates><panel_attributes>&lt;&lt;PlayerController&gt;&gt;
+--
+FIELDS
+--
+--
+PROPERTIES
+--
+--
+METHODS
+--
+- void SetInputs()</panel_attributes><additional_attributes></additional_attributes></element></diagram>
