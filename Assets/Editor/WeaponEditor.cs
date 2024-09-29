@@ -6,30 +6,62 @@ using UnityEditor;
 [CustomEditor(typeof(WeaponScriptable))]
 public class WeaponEditor : Editor
 {
-    SerializedProperty weaponRange;
-    SerializedProperty weaponDamage;
-    SerializedProperty weaponRatesOfFire;
-    SerializedProperty weaponType;
-    SerializedProperty projectilePrefab;
-    SerializedProperty projectileSpeed;
+    private SerializedProperty _weaponType;
+    private SerializedProperty _weaponRange;
+    private SerializedProperty _weaponDamage;
+    private SerializedProperty _weaponSalvoReload;
+    private SerializedProperty _projectilePrefab;
+    private SerializedProperty _projectileSpeed;
+    private SerializedProperty _weaponSalvoLength;
+    private SerializedProperty _weaponShotReload;
+    private SerializedProperty _ammo;
+    private SerializedProperty _homing;
+
     public void OnEnable()
     {
-        weaponRange = serializedObject.FindProperty("weaponRange");
-        weaponDamage = serializedObject.FindProperty("weaponDamage");
-        weaponDamage = serializedObject.FindProperty("weaponRatesOfFire");
-        weaponDamage = serializedObject.FindProperty("weaponType");
-        weaponDamage = serializedObject.FindProperty("projectilePrefab");
-        weaponDamage = serializedObject.FindProperty("projectileSpeed");
+        _weaponType = serializedObject.FindProperty("weaponType");
+        _weaponRange = serializedObject.FindProperty("weaponRange");
+        _weaponDamage = serializedObject.FindProperty("weaponDamage");
+        _weaponSalvoReload = serializedObject.FindProperty("weaponSalvoReload");
+        _projectilePrefab = serializedObject.FindProperty("projectilePrefab");
+        _projectileSpeed = serializedObject.FindProperty("projectileSpeed");
+        _weaponSalvoLength = serializedObject.FindProperty("weaponSalvoLength");
+        _weaponShotReload = serializedObject.FindProperty("weaponShotReload");
+        _ammo = serializedObject.FindProperty("ammo");
+        _homing = serializedObject.FindProperty("homing");
     }
 
     public override void OnInspectorGUI()
     {
+        WeaponScriptable _weaponScriptable = (WeaponScriptable)target;
         serializedObject.Update();
 
-        EditorGUILayout.PropertyField(weaponType);
+        EditorGUILayout.PropertyField(_weaponType);
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField("Weapon Base Statistics");
+        EditorGUILayout.PropertyField(_weaponRange);
+        EditorGUILayout.PropertyField(_weaponDamage);
+        EditorGUILayout.PropertyField(_weaponSalvoReload);
+        EditorGUILayout.PropertyField(_weaponSalvoLength);
+        EditorGUILayout.PropertyField(_weaponShotReload);
+        EditorGUILayout.PropertyField(_ammo);
+        if (_weaponScriptable.weaponType == WeaponScriptable.WeaponType.Missile)
+        {
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Weapon Projectiles");
+            EditorGUILayout.PropertyField(_projectilePrefab);
+            EditorGUILayout.PropertyField(_projectileSpeed);
+            EditorGUILayout.PropertyField(_homing);
+        }
+        else if(_weaponScriptable.weaponType == WeaponScriptable.WeaponType.Kenetic)
+        {
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Weapon Projectiles");
+            EditorGUILayout.PropertyField(_projectilePrefab);
+            EditorGUILayout.PropertyField(_projectileSpeed);
+        }
 
-        EditorGUILayout.PropertyField(weaponRange);
-        EditorGUILayout.PropertyField(weaponDamage);
-        EditorGUILayout.PropertyField(weaponDamage);
+
+            serializedObject.ApplyModifiedProperties();
     }
 }

@@ -6,23 +6,41 @@ public class Weapon : MonoBehaviour
 {
     [SerializeField]
     private WeaponScriptable weaponStats;
-    public float weaponRange
+    [SerializeField]
+    private float weaponRange
     {
         get { return weaponStats.weaponRange; }
         set { weaponStats.weaponRange = value; }
     }
-    public float weaponDamage
+    [SerializeField]
+    private float weaponDamage
     {
         get { return weaponStats.weaponDamage; }
         set { weaponStats.weaponDamage = value; }
     }
-    public float weaponRof
+    [SerializeField]
+    private float weaponSalvoReload
     {
-        get { return weaponStats.weaponRatesOfFire; }
+        get { return weaponStats.weaponSalvoReload; }
         set { weaponStats.weaponDamage = value; }
     }
 
-    public WeaponScriptable.WeaponType weaponType
+    [SerializeField]
+    private float weaponSalvoLength
+    {
+        get { return weaponStats.weaponSalvoLength; }
+        set { weaponStats.weaponDamage = value; }
+    }
+
+    [SerializeField]
+    private float weaponShotReload
+    {
+        get { return weaponStats.weaponShotReload; }
+        set { weaponStats.weaponDamage = value; }
+    }
+
+    [SerializeField]
+    private WeaponScriptable.WeaponType weaponType
     {
         get { return weaponStats.weaponType; }
         set { weaponStats.weaponType = value; }
