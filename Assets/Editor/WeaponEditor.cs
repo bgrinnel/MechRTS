@@ -38,17 +38,18 @@ public class WeaponEditor : Editor
 
         EditorGUILayout.PropertyField(_weaponType);
         EditorGUILayout.Space();
-        EditorGUILayout.LabelField("Weapon Base Statistics");
+        EditorGUILayout.LabelField("Weapon Base Statistics", EditorStyles.boldLabel);
         EditorGUILayout.PropertyField(_weaponRange);
         EditorGUILayout.PropertyField(_weaponDamage);
         EditorGUILayout.PropertyField(_weaponSalvoReload);
         EditorGUILayout.PropertyField(_weaponSalvoLength);
         EditorGUILayout.PropertyField(_weaponShotReload);
         EditorGUILayout.PropertyField(_ammo);
+
         if (_weaponScriptable.weaponType == WeaponScriptable.WeaponType.Missile)
         {
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("Weapon Projectiles");
+            EditorGUILayout.LabelField("Weapon Projectiles", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(_projectilePrefab);
             EditorGUILayout.PropertyField(_projectileSpeed);
             EditorGUILayout.PropertyField(_homing);
@@ -56,12 +57,12 @@ public class WeaponEditor : Editor
         else if(_weaponScriptable.weaponType == WeaponScriptable.WeaponType.Kenetic)
         {
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("Weapon Projectiles");
+            EditorGUILayout.LabelField("Weapon Projectiles", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(_projectilePrefab);
             EditorGUILayout.PropertyField(_projectileSpeed);
         }
 
 
-            serializedObject.ApplyModifiedProperties();
+        serializedObject.ApplyModifiedProperties();
     }
 }
