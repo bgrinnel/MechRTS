@@ -5,19 +5,35 @@ using Unity.VisualScripting;
 
 public class RTSController : MonoBehaviour
 {
-    public RectTransform selectionBox;
-    public Vector3 screenPos;
-    public Vector3 worldPos;
-    public LayerMask unitLayerMask;
-    public LayerMask background;
-    public LayerMask enemy;
-    public float clickThreshold = 0.5f; // To distinguish between click and drag
+    [SerializeField] private RectTransform selectionBox;
+    [SerializeField] private Vector3 screenPos;
+    [SerializeField] private Vector3 worldPos;
+    [SerializeField] private LayerMask unitLayerMask;
+    [SerializeField] private LayerMask backgroundLayerMask;
+    [SerializeField] private LayerMask enemyLayerMask;
+    [SerializeField] private float clickThreshold = 0.5f; // To distinguish between click and drag
 
     private Vector2 startPos;
     [SerializeField] CameraController camState;
+
     private bool isDragging = false;
     [SerializeField] private GameObject moveTargetEffect;
 
+
+    [SerializeField] private List<GameObject> _playerUnits = new List<GameObject>();
+
+    [SerializeField] private List<GameObject> _selectedUnits = new List<GameObject>();
+    public bool _shiftPressed;
+    public bool _holdingCtrl;
+    public List<GameObject>[] unitGroups = new List<GameObject>[10];
+
+    private void Awake()
+    {
+        for (int i = 1; i < unitGroups.Length; i++) 
+        {
+            unitGroups[i] = new List<GameObject>();
+        }
+    }
     private void Start()
     {
         selectionBox.gameObject.SetActive(false);
@@ -25,12 +41,10 @@ public class RTSController : MonoBehaviour
     void Update()
     {
         MouseInput();
-        ShiftAndCtrlInput();
-        ControlGroupsInput();
     }
     void MouseInput()
     {
-        /*
+        
         //Unit selection code
         if (Input.GetMouseButtonDown(0))
         {
@@ -40,7 +54,7 @@ public class RTSController : MonoBehaviour
             selectionBox.gameObject.SetActive(false); // Hide Selection box initially
         }
 
-        if (Input.GetMouseButton(0)&& camState.getSettingsMenu() == false)
+        if (Input.GetMouseButton(0))
         {
             // Check if dragging or clicking
             if (Vector2.Distance(startPos, Input.mousePosition) > clickThreshold)
@@ -51,7 +65,7 @@ public class RTSController : MonoBehaviour
             }
         }
         //left mouse click
-        if (Input.GetMouseButtonUp(0) && camState.getSettingsMenu() == false)
+        if (Input.GetMouseButtonUp(0) )
         {
             if (isDragging)
             {
@@ -66,7 +80,7 @@ public class RTSController : MonoBehaviour
                 SelectSingleUnit();
             }
         }
-        */
+        
         //right mouse click
         if (Input.GetMouseButtonDown(0))
         {
@@ -74,7 +88,7 @@ public class RTSController : MonoBehaviour
             Ray ray = Camera.main.ScreenPointToRay(screenPos);
             if(Physics.Raycast(ray,  out RaycastHit hitData2, 1000, enemy)){
                 Transform clickedEnemy = hitData2.collider.transform;
-                foreach (var unit in UnitController.instance.Selected()){
+                foreach (var unit in _selectedUnits){
                     Ship_Follow_Script pass_Script = unit.GetComponent<Ship_Follow_Script>();
                     pass_Script.PassTarget(clickedEnemy);
                 }
@@ -109,7 +123,14 @@ public class RTSController : MonoBehaviour
        //Debug.Log("size " + size);
         var unitsBoxed = Physics.OverlapBox(center,size , Quaternion.identity, unitLayerMask);
         //var unitsBoxed = Physics2D.OverlapAreaAll(start, end);
-        UnitController.instance.DragSelect(unitsBoxed);
+        if (!_shiftPressed) { _selectedUnits.Clear(); }
+        foreach (var unit in units)
+        {
+            if (!_selectedUnits.Contains(unit.gameObject))
+            {
+                _selectedUnits.Add(unit.gameObject);
+            }
+        }
     }
 
     void SelectSingleUnit()
@@ -120,13 +141,13 @@ public class RTSController : MonoBehaviour
         Ray ray = Camera.main.ScreenPointToRay(screenPos);
         if(Physics.Raycast(ray,  out RaycastHit hitData, 100, unitLayerMask)){
             GameObject clickedUnit = hitData.collider.gameObject;
-            UnitController.instance.DeSelectAll();
-            UnitController.instance.Select(clickedUnit);
+            DeSelectAll();
+            Select(clickedUnit);
             // Add visual feedback or other logic for selection
         }
         else
         {   
-            UnitController.instance.DeSelectAll();
+            DeSelectAll();
             // Handle deselection if needed
         }
         transform.position = worldPos;
@@ -148,63 +169,61 @@ public class RTSController : MonoBehaviour
             worldPos = hitData.point;
             GameObject splashEffect = Instantiate(moveTargetEffect, worldPos, transform.rotation);
             Destroy(splashEffect, 0.5f);
-            //GameObject[] selectedUnits = UnitController.instance.Selected();
-            foreach (var unit in UnitController.instance.Selected()){
+
+            foreach (var unit in _selectedUnits){
                 Ship_Follow_Script pass_Script = unit.GetComponent<Ship_Follow_Script>();
-                pass_Script.PassDestination(worldPos,UnitController.instance._shiftPressed);
+                pass_Script.PassDestination(worldPos,_shiftPressed);
             }
         }
         
     }
 
-    void ShiftAndCtrlInput()
+    
+    public void Select(GameObject unit)
     {
-        if (Input.GetKey(KeyCode.LeftShift))
-        {
-            UnitController.instance._shiftPressed = true;
-        }
-        else
-        {
-            UnitController.instance._shiftPressed = false;
-        }
+        if (!_shiftPressed) { _selectedUnits.Clear(); }
+        _selectedUnits.Add(unit);
+    }
+    public List<GameObject> Selected()
+    {
+        return(_selectedUnits);
+    }
 
-        if (Input.GetKey(KeyCode.LeftControl))
+    public void DeSelect(GameObject unit)
+    {
+        if (_selectedUnits.Contains(unit))
         {
-            UnitController.instance._holdingCtrl = true;
-        }
-        else
-        {
-            UnitController.instance._holdingCtrl = false;
+            _selectedUnits.Remove(unit);
         }
     }
 
-    void ControlGroupsInput()
+    public void DeSelectAll()
     {
-        if (Input.GetKey(KeyCode.LeftControl))
+        _selectedUnits.Clear();
+    }
+
+    
+
+    public void AssignControlGroups(int groupnumber)
+    {
+        foreach (var unit in _selectedUnits)
         {
-            if (Input.GetKeyDown(KeyCode.Alpha0)) { UnitController.instance.AssignControlGroups(0); }
-            else if (Input.GetKeyDown(KeyCode.Alpha1)) { UnitController.instance.AssignControlGroups(1); }
-            else if (Input.GetKeyDown(KeyCode.Alpha2)) { UnitController.instance.AssignControlGroups(2); }
-            else if (Input.GetKeyDown(KeyCode.Alpha3)) { UnitController.instance.AssignControlGroups(3); }
-            else if (Input.GetKeyDown(KeyCode.Alpha4)) { UnitController.instance.AssignControlGroups(4); }
-            else if (Input.GetKeyDown(KeyCode.Alpha5)) { UnitController.instance.AssignControlGroups(5); }
-            else if (Input.GetKeyDown(KeyCode.Alpha6)) { UnitController.instance.AssignControlGroups(6); }
-            else if (Input.GetKeyDown(KeyCode.Alpha7)) { UnitController.instance.AssignControlGroups(7); }
-            else if (Input.GetKeyDown(KeyCode.Alpha8)) { UnitController.instance.AssignControlGroups(8); }
-            else if (Input.GetKeyDown(KeyCode.Alpha9)) { UnitController.instance.AssignControlGroups(9); }
+            unitGroups[groupnumber].Add(unit);
         }
-        else
+        Debug.Log("unit assigned to group " + groupnumber);
+    }
+
+    public void CallControlGroups(int grounpnumber)
+    {
+        _selectedUnits.Clear();
+
+        foreach (var unit in unitGroups[grounpnumber])
         {
-            if (Input.GetKeyDown(KeyCode.Alpha0)) { UnitController.instance.CallControlGroups(0); }
-            else if (Input.GetKeyDown(KeyCode.Alpha1)) { UnitController.instance.CallControlGroups(1); }
-            else if (Input.GetKeyDown(KeyCode.Alpha2)) { UnitController.instance.CallControlGroups(2); }
-            else if (Input.GetKeyDown(KeyCode.Alpha3)) { UnitController.instance.CallControlGroups(3); }
-            else if (Input.GetKeyDown(KeyCode.Alpha4)) { UnitController.instance.CallControlGroups(4); }
-            else if (Input.GetKeyDown(KeyCode.Alpha5)) { UnitController.instance.CallControlGroups(5); }
-            else if (Input.GetKeyDown(KeyCode.Alpha6)) { UnitController.instance.CallControlGroups(6); }
-            else if (Input.GetKeyDown(KeyCode.Alpha7)) { UnitController.instance.CallControlGroups(7); }
-            else if (Input.GetKeyDown(KeyCode.Alpha8)) { UnitController.instance.CallControlGroups(8); }
-            else if (Input.GetKeyDown(KeyCode.Alpha9)) { UnitController.instance.CallControlGroups(9); }
+            if (unit != null && !_selectedUnits.Contains(unit))
+            {
+                _selectedUnits.Add(unit);
+            }
         }
     }
+    
 }
