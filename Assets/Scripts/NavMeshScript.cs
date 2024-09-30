@@ -6,10 +6,10 @@ using UnityEngine.AI;
 public class NavMeshScript : MonoBehaviour
 {
     [SerializeField] private float stopDistance;
-    void updateDestination(NavMeshAgent agent, Transform newDest){
-        agent.destination = newDest.position;
+    public void updateDestination(NavMeshAgent agent, Vector3 newDest){
+        agent.destination = newDest;
     }
-    bool reachedDestination(NavMeshAgent agent){
+    public bool reachedDestination(NavMeshAgent agent){
         if(agent.remainingDistance <= stopDistance){
             return true;
         }

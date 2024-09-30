@@ -86,11 +86,12 @@ public class RTSController : MonoBehaviour
         {
             screenPos = Input.mousePosition;
             Ray ray = Camera.main.ScreenPointToRay(screenPos);
-            if(Physics.Raycast(ray,  out RaycastHit hitData2, 1000, enemy)){
+            if(Physics.Raycast(ray,  out RaycastHit hitData2, 1000, enemyLayerMask)){
                 Transform clickedEnemy = hitData2.collider.transform;
                 foreach (var unit in _selectedUnits){
-                    Ship_Follow_Script pass_Script = unit.GetComponent<Ship_Follow_Script>();
-                    pass_Script.PassTarget(clickedEnemy);
+                    //TODO Enemy setup
+                    //NavMeshScript pass_Script = unit.GetComponent<NavMeshScript>();
+                    //pass_Script.PassTarget(clickedEnemy);
                 }
             }
         }
@@ -124,7 +125,7 @@ public class RTSController : MonoBehaviour
         var unitsBoxed = Physics.OverlapBox(center,size , Quaternion.identity, unitLayerMask);
         //var unitsBoxed = Physics2D.OverlapAreaAll(start, end);
         if (!_shiftPressed) { _selectedUnits.Clear(); }
-        foreach (var unit in units)
+        foreach (var unit in _playerUnits)
         {
             if (!_selectedUnits.Contains(unit.gameObject))
             {
@@ -165,14 +166,14 @@ public class RTSController : MonoBehaviour
     {
         screenPos = Input.mousePosition;
         Ray ray = Camera.main.ScreenPointToRay(screenPos);
-        if(Physics.Raycast(ray,  out RaycastHit hitData, 1000, background)){
+        if(Physics.Raycast(ray,  out RaycastHit hitData, 1000, backgroundLayerMask)){
             worldPos = hitData.point;
             GameObject splashEffect = Instantiate(moveTargetEffect, worldPos, transform.rotation);
             Destroy(splashEffect, 0.5f);
 
             foreach (var unit in _selectedUnits){
-                Ship_Follow_Script pass_Script = unit.GetComponent<Ship_Follow_Script>();
-                pass_Script.PassDestination(worldPos,_shiftPressed);
+                NavMeshScript pass_Script = unit.GetComponent<NavMeshScript>();
+                pass_Script.updateDestination(unit.GetComponent<UnityEngine.AI.NavMeshAgent>(),worldPos);
             }
         }
         
