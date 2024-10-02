@@ -172,8 +172,8 @@ public class RTSController : MonoBehaviour
             Destroy(splashEffect, 0.5f);
 
             foreach (var unit in _selectedUnits){
-                NavMeshScript pass_Script = unit.GetComponent<NavMeshScript>();
-                pass_Script.updateDestination(unit.GetComponent<UnityEngine.AI.NavMeshAgent>(),worldPos);
+                MechBehavior mech = unit.GetComponent<MechBehavior>();
+                mech.SetWaypoint(worldPos);
             }
         }
         

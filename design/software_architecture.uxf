@@ -1,4 +1,4 @@
-<diagram program="umletino" version="15.1"><zoom_level>10</zoom_level><help_text>Space for diagram notes</help_text><element><id>UMLClass</id><coordinates><x>690</x><y>700</y><w>450</w><h>180</h></coordinates><panel_attributes>&lt;&lt;Mech&gt;&gt;
+<diagram program="umletino" version="15.1"><zoom_level>10</zoom_level><help_text>Space for diagram notes</help_text><element><id>UMLClass</id><coordinates><x>1220</x><y>800</y><w>450</w><h>180</h></coordinates><panel_attributes>&lt;&lt;Mech&gt;&gt;
 MonoBehaviour, IControllable
 --
 COMPONENTS
@@ -17,13 +17,13 @@ METHODS
 
 
 
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1220</x><y>480</y><w>490</w><h>110</h></coordinates><panel_attributes>&lt;&lt;NavClass&gt;&gt;
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1750</x><y>580</y><w>490</w><h>110</h></coordinates><panel_attributes>&lt;&lt;NavClass&gt;&gt;
 --
 FIELDS
 --
 --
 METHODS
---</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>800</x><y>320</y><w>220</w><h>130</h></coordinates><panel_attributes>&lt;&lt;Controller&gt;&gt;
+--</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1390</x><y>350</y><w>220</w><h>130</h></coordinates><panel_attributes>&lt;&lt;Controller&gt;&gt;
 --
 FIELDS
 --
@@ -35,7 +35,7 @@ PROPERTIES
 --
 METHODS
 --
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>410</x><y>480</y><w>200</w><h>170</h></coordinates><panel_attributes>&lt;&lt;MechType&gt;&gt;
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>940</x><y>580</y><w>200</w><h>170</h></coordinates><panel_attributes>&lt;&lt;MechType&gt;&gt;
 --
 COMPONENTS
 --
@@ -49,7 +49,7 @@ FIELDS
 
 --
 METHODS
---</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>680</x><y>480</y><w>220</w><h>130</h></coordinates><panel_attributes>&lt;&lt;EnemyController&gt;&gt;
+--</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1210</x><y>580</y><w>220</w><h>130</h></coordinates><panel_attributes>&lt;&lt;EnemyController&gt;&gt;
 --
 FIELDS
 --
@@ -59,7 +59,7 @@ PROPERTIES
 --
 METHODS
 --
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>930</x><y>480</y><w>220</w><h>150</h></coordinates><panel_attributes>&lt;&lt;PlayerController&gt;&gt;
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1460</x><y>580</y><w>220</w><h>150</h></coordinates><panel_attributes>&lt;&lt;PlayerController&gt;&gt;
 --
 FIELDS
 --
@@ -69,4 +69,18 @@ PROPERTIES
 --
 METHODS
 --
-- void SetInputs()</panel_attributes><additional_attributes></additional_attributes></element></diagram>
+- void SetInputs()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>830</x><y>320</y><w>220</w><h>130</h></coordinates><panel_attributes>&lt;&lt;NavMeshAgent&gt;&gt;
+--
+FIELDS
+--
+--
+PROPERTIES
+--
++ Vec3 NextLocation()
+
+--
+METHODS
+--
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLPackage</id><coordinates><x>310</x><y>210</y><w>490</w><h>750</h></coordinates><panel_attributes>MechPrefab
+--
+bg=transparent</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>330</x><y>250</y><w>220</w><h>30</h></coordinates><panel_attributes>&lt;&lt;NavMeshAgent&gt;&gt;</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>340</x><y>310</y><w>220</w><h>30</h></coordinates><panel_attributes>&lt;&lt;RigidBody&gt;&gt;</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>360</x><y>400</y><w>220</w><h>30</h></coordinates><panel_attributes>&lt;&lt;Collider&gt;&gt;</panel_attributes><additional_attributes></additional_attributes></element></diagram>
