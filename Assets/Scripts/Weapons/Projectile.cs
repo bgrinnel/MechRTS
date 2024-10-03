@@ -82,7 +82,7 @@ public class Projectile : MonoBehaviour
     {
         var predictionTime = Mathf.Lerp(0, _maxTimePrediction, leadTimePercentage);
 
-        //_standardPrediction = _target.Rb.position + _target.Rb.velocity * predictionTime;
+        _standardPrediction = _target.GetComponent<Rigidbody>().position + _target.GetComponent<Rigidbody>().velocity * predictionTime;
     }
 
     private void AddDeviation(float leadTimePercentage)
