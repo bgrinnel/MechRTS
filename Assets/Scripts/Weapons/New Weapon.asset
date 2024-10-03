@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84e4aea864ed50446a2aff409ab67e76, type: 3}
   m_Name: New Weapon
   m_EditorClassIdentifier: 
-  weaponType: 3
+  weaponType: 1
   weaponRange: 0
   weaponDamage: 0
   weaponSalvoReload: 0

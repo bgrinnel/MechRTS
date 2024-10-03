@@ -60,29 +60,43 @@ public class Weapon : MonoBehaviour
         set { weaponStats.homing = value; }
     }
 
-    public void Fire()
+    public void Fire(GameObject target = null)
     {
         switch (weaponType)
         {
             case WeaponScriptable.WeaponType.DirectEffect:
                 break;
             case WeaponScriptable.WeaponType.Kenetic:
+                KeneticSalvo();
+                break;
+            case WeaponScriptable.WeaponType.Missile:
+                if (homing) {MissileSalvo(target); }
+                else { MissileSalvo(); }
                 break;
         }
     }
 
-    private void KeneticSalvo(GameObject target)
+    private void KeneticSalvo()
     {
         var projectile = Instantiate(weaponStats.projectilePrefab);
         projectile.GetComponent<Projectile>().SetMode(0);
-        projectile.GetComponent<Projectile>().InitializeProjectile(weaponDamage, weaponStats.projectileSpeed, target);
+        projectile.GetComponent<Projectile>().InitializeProjectile(weaponDamage, weaponStats.projectileSpeed);
     }
 
-    private void MissileSalvo(GameObject target)
+    private void MissileSalvo(GameObject target = null)
     {
         var missile = Instantiate(weaponStats.projectilePrefab);
         missile.GetComponent<Projectile>().SetMode(1, homing);
         missile.GetComponent<Projectile>().InitializeProjectile(weaponDamage, weaponStats.projectileSpeed, target);
+    }
+
+    private void DirectEffect(GameObject target = null)
+    {
+
+    }
+
+    private void Area()
+    {
 
     }
 }

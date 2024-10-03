@@ -37,7 +37,8 @@ public class Projectile : MonoBehaviour
 
     private void Missile()
     {
-        throw new NotImplementedException();
+        Rigidbody rb = GetComponent<Rigidbody>();
+        rb.velocity = Vector3.forward * _speed;
     }
 
     private void HomingMissile()
@@ -46,10 +47,17 @@ public class Projectile : MonoBehaviour
         rb.velocity = Vector3.forward * _speed;
 
         var leadTimePercentage = Mathf.InverseLerp(_minDistancePredict, _maxDistancePredict, Vector3.Distance(transform.position, _target.transform.position));
+
+        PredictMovement(leadTimePercentage);
+
+        AddDeviation(leadTimePercentage);
+
+        RotateRocket();
     }
     private void KeneticWeapons()
     {
-
+        Rigidbody rb = GetComponent<Rigidbody>();
+        rb.velocity = Vector3.forward * _speed;
     }
     public void SetMode(int mode, bool homing = false)
     {
@@ -57,7 +65,7 @@ public class Projectile : MonoBehaviour
         _homing = homing;
     }
 
-    public void InitializeProjectile(float damage, float speed, GameObject target)
+    public void InitializeProjectile(float damage, float speed, GameObject target = null)
     {
         _damage = damage;
         _speed = speed;
@@ -74,7 +82,7 @@ public class Projectile : MonoBehaviour
     {
         var predictionTime = Mathf.Lerp(0, _maxTimePrediction, leadTimePercentage);
 
-        _standardPrediction = _target.Rb.position + _target.Rb.velocity * predictionTime;
+        //_standardPrediction = _target.Rb.position + _target.Rb.velocity * predictionTime;
     }
 
     private void AddDeviation(float leadTimePercentage)
