@@ -13,9 +13,13 @@ public class WeaponScriptable : ScriptableObject
     public float weaponSalvoReload;
     public float weaponSalvoLength;
     public float weaponShotReload;
-    public GameObject projectilePrefab;
-    public float projectileSpeed;
     public int ammo;
     public bool homing;
+    public GameObject projectilePrefab;
+    public float projectileSpeed;
+    public float projectileRotationSpeed;
+    public float maxDistancePredict = 100;
+    public float minDistancePredict = 5;
+    public float maxTimePrediction = 5;
 }
 
