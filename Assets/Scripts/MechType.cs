@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+
+[CreateAssetMenu(fileName = "MechType_new_mech_type_name", menuName = "MechType")]
 public class MechType : ScriptableObject
 {
     /// <summary>
@@ -9,7 +11,7 @@ public class MechType : ScriptableObject
     /// </summary>
     /// <param name="mechs"></param>
     /// <returns></returns>
-    public delegate MechBehavior SelectTargetAlgorithm(MechBehavior selector, params MechBehavior[] mechs);
+    public delegate MechBehavior SelectionAlgorithm(MechBehavior selector, params MechBehavior[] mechs);
 
     /// <summary>
     /// The max health of this mech
@@ -17,29 +19,32 @@ public class MechType : ScriptableObject
     public float maxHealth;
 
     /// <summary>
-    /// The distance form a waypoint this mech will stop (without aggro)
+    /// A struct for wrapping
     /// </summary>
-    public float stopDistance;
+    public TNavMeshAgentType agentType = new TNavMeshAgentType{
+        speed = 15f,
+        angularSpeed = 120f,
+        acceleration = .3f,
+        stoppingDistance = 3f,
+        autoBraking = true,
+        radius = 2f,
+        height = 5f
+    };
 
     /// <summary>
-    /// The speed this mech can turn in place (in degrees)
+    /// The RigidBody.mass of this mech
     /// </summary>
-    public float turnSpeed;
+    public float mass;
 
     /// <summary>
-    /// The initial magnitude of the mech's velocity (from stand-still)
+    /// The RigidBody.drag of this mech
     /// </summary>
-    public float moveSpeedInitial;
+    public float drag;
 
     /// <summary>
-    /// The acceleration of this mech per second
+    /// The RigidBody.angularDrag of this mech
     /// </summary>
-    public float moveSpeedAcc;
-
-    /// <summary>
-    /// The maximum magnitude of this mech's velocity
-    /// </summary>
-    public float moveSpeedMax;
+    public float angularDrag;
 
     /// <summary>
     /// How far enemies can be seen by this mech (draws immediate aggro)
@@ -52,9 +57,9 @@ public class MechType : ScriptableObject
     public float hearingRange;
 
     /// <summary>
-    /// How
+    /// How the unit chooses an enemy target
     /// </summary>
-    public SelectTargetAlgorithm targetingAlgorithm;
+    public SelectionAlgorithm selectionAlg = SelectionAlg.Closest;
 
     /// <summary>
     /// A list of all the weapons this mech has
@@ -62,17 +67,17 @@ public class MechType : ScriptableObject
     public List<WeaponScriptable> WeaponTypes;
 }
 
-public static class SelectTargetAlgorithms
+public static class SelectionAlg
 {
-    public static MechBehavior SelectedLowestHealth(MechBehavior selector, params MechBehavior[] mechs)
+    public static MechBehavior LowestHealth(MechBehavior selector, params MechBehavior[] mechs)
     {
-        return mechs.OrderBy((mech) => mech.combateBehaviour.GetHealth().Current).First();
+        return mechs.OrderBy((mech) => mech.combatBehaviour.GetHealth().Current).First();
     }
-    public static MechBehavior SelectClosest(MechBehavior selector, params MechBehavior[] mechs)
+    public static MechBehavior Closest(MechBehavior selector, params MechBehavior[] mechs)
     {
         return mechs.OrderBy((mech) => (selector.transform.position - mech.transform.position).sqrMagnitude).First();
     }
-    public static MechBehavior SelectHighestHealth(MechBehavior selector, params MechBehavior[] mechs)
+    public static MechBehavior HighestHealth(MechBehavior selector, params MechBehavior[] mechs)
     {
         return mechs.OrderByDescending((mech) => (selector.transform.position - mech.transform.position).sqrMagnitude).First();
     }
