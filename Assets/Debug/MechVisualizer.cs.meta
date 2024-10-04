@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: a0ace3fd8904f7c44a3e9e0c899f0aff
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - playerMat: {fileID: 2100000, guid: a4ab755eaaeadc74ca2425c1391613d4, type: 2}
+  - enemyMat: {fileID: 2100000, guid: d9909b27a47829b4abd2803870e3a752, type: 2}
+  - mech: {instanceID: 0}
+  - navAgent: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

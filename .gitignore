@@ -94,4 +94,6 @@ crashlytics-build.properties
 *.bak
 
 #project specifics
-Assets\Scenes\jeffs_wip\*
+Assets\Scenes\jeffs_wip\*Assets/WIP/*
+WIP.meta
+Assets/WIP/**

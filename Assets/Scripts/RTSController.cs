@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 
 public class RTSController : MonoBehaviour
 {
@@ -82,16 +81,14 @@ public class RTSController : MonoBehaviour
         }
         
         //right mouse click
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(1))
         {
             screenPos = Input.mousePosition;
             Ray ray = Camera.main.ScreenPointToRay(screenPos);
             if(Physics.Raycast(ray,  out RaycastHit hitData2, 1000, enemyLayerMask)){
-                Transform clickedEnemy = hitData2.collider.transform;
+                var mech = hitData2.collider.gameObject.GetComponent<MechBehavior>();
                 foreach (var unit in _selectedUnits){
-                    //TODO Enemy setup
-                    //NavMeshScript pass_Script = unit.GetComponent<NavMeshScript>();
-                    //pass_Script.PassTarget(clickedEnemy);
+                    unit.GetComponent<MechBehavior>().CommandSetTarget(mech);
                 }
             }
         }
@@ -172,8 +169,8 @@ public class RTSController : MonoBehaviour
             Destroy(splashEffect, 0.5f);
 
             foreach (var unit in _selectedUnits){
-                NavMeshScript pass_Script = unit.GetComponent<NavMeshScript>();
-                pass_Script.updateDestination(unit.GetComponent<UnityEngine.AI.NavMeshAgent>(),worldPos);
+                MechBehavior mech = unit.GetComponent<MechBehavior>();
+                mech.CommandSetWaypoint(worldPos);
             }
         }
         
