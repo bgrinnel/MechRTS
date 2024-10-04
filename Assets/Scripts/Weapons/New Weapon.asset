@@ -12,13 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84e4aea864ed50446a2aff409ab67e76, type: 3}
   m_Name: New Weapon
   m_EditorClassIdentifier: 
-  weaponType: 2
+  weaponType: 1
   weaponRange: 0
   weaponDamage: 0
   weaponSalvoReload: 0
   weaponSalvoLength: 0
   weaponShotReload: 0
-  projectilePrefab: {fileID: 0}
-  projectileSpeed: 0
   ammo: 0
   homing: 0
+  projectilePrefab: {fileID: 0}
+  projectileSpeed: 0
+  projectileRotationSpeed: 0
+  maxDistancePredict: 100
+  minDistancePredict: 5
+  maxTimePrediction: 5

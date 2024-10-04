@@ -16,6 +16,10 @@ public class WeaponEditor : Editor
     private SerializedProperty _weaponShotReload;
     private SerializedProperty _ammo;
     private SerializedProperty _homing;
+    private SerializedProperty _projectileRotationSpeed;
+    private SerializedProperty _maxDistancePredict;
+    private SerializedProperty _minDistancePredict;
+    private SerializedProperty _maxTimePrediction;
 
     public void OnEnable()
     {
@@ -29,6 +33,10 @@ public class WeaponEditor : Editor
         _weaponShotReload = serializedObject.FindProperty("weaponShotReload");
         _ammo = serializedObject.FindProperty("ammo");
         _homing = serializedObject.FindProperty("homing");
+        _projectileRotationSpeed = serializedObject.FindProperty("projectileRotationSpeed");
+        _maxDistancePredict = serializedObject.FindProperty("maxDistancePredict");
+        _minDistancePredict = serializedObject.FindProperty("minDistancePredict");
+        _maxTimePrediction = serializedObject.FindProperty("maxTimePrediction");
     }
 
     public override void OnInspectorGUI()
@@ -53,6 +61,15 @@ public class WeaponEditor : Editor
             EditorGUILayout.PropertyField(_projectilePrefab);
             EditorGUILayout.PropertyField(_projectileSpeed);
             EditorGUILayout.PropertyField(_homing);
+            if (_weaponScriptable.homing)
+            {
+                EditorGUILayout.PropertyField(_projectileRotationSpeed);
+                EditorGUILayout.Space();
+                EditorGUILayout.LabelField("Weapon P", EditorStyles.boldLabel);
+                EditorGUILayout.PropertyField(_maxDistancePredict);
+                EditorGUILayout.PropertyField(_minDistancePredict);
+                EditorGUILayout.PropertyField(_maxTimePrediction);
+            }
         }
         else if(_weaponScriptable.weaponType == WeaponScriptable.WeaponType.Kenetic)
         {
