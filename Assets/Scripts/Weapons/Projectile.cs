@@ -35,6 +35,10 @@ public class Projectile : MonoBehaviour
         }
     }
 
+    // To: VK, From: Jeff - for damaging a mech you'll need a reference to this projectilies owning MechBehaviour and then you just say owning_mech.HitMech(MechBehaviour target, float damage)
+    // also, their are two collision layers for characters; "Player" and "Enemy". I have already made a tag for "Mech" that all mechs have. When spawning Projectiles it would be nice if you assigned them
+    // the same collision layer as their spawner (you can get it directly from the GameObject.layer or assign it based on bool MechBehaviour.IsPlayer()). It would also be nice if you gave all projectiles.gameObject a tag (probably called projectile)
+    // currently I don't initialize Weapons[] MechBehaviour._weapons because you don't have a constructor. The CustomEditor is a beast so if you just want to hand that off to me once you finish here that's completely fine.
     private void Missile()
     {
         Rigidbody rb = GetComponent<Rigidbody>();

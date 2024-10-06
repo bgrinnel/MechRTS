@@ -1,0 +1,100 @@
+<diagram program="umletino" version="15.1"><zoom_level>8</zoom_level><help_text>Space for diagram notes</help_text><element><id>UMLClass</id><coordinates><x>1008</x><y>962</y><w>360</w><h>144</h></coordinates><panel_attributes>&lt;&lt;Mech&gt;&gt;
+MonoBehaviour, IControllable
+--
+COMPONENTS
+--
++ Controller
+
+--
+FIELDS
+--
+- float Health
+- ScriptableObject Mechtype
+--
+--
+METHODS
+--
+
+
+
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1432</x><y>786</y><w>392</w><h>88</h></coordinates><panel_attributes>&lt;&lt;NavClass&gt;&gt;
+--
+FIELDS
+--
+--
+METHODS
+--</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>0</x><y>330</y><w>176</w><h>104</h></coordinates><panel_attributes>&lt;&lt;Controller&gt;&gt;
+--
+FIELDS
+--
+--
+PROPERTIES
+--
++ Vec3 NextLocation()
+
+--
+METHODS
+--
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>296</x><y>314</y><w>160</w><h>136</h></coordinates><panel_attributes>&lt;&lt;MechType&gt;&gt;
+--
+COMPONENTS
+--
+--
+FIELDS
+--
++ float MaxHealth
++ float TurnVel
++ float MoveAcc
++ float MoveVelMax
+
+--
+METHODS
+--</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>848</x><y>794</y><w>176</w><h>104</h></coordinates><panel_attributes>&lt;&lt;EnemyController&gt;&gt;
+--
+FIELDS
+--
+--
+PROPERTIES
+--
+--
+METHODS
+--
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1200</x><y>786</y><w>176</w><h>120</h></coordinates><panel_attributes>&lt;&lt;PlayerController&gt;&gt;
+--
+FIELDS
+--
+--
+PROPERTIES
+--
+--
+METHODS
+--
+- void SetInputs()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>696</x><y>578</y><w>176</w><h>104</h></coordinates><panel_attributes>&lt;&lt;NavMeshAgent&gt;&gt;
+--
+FIELDS
+--
+--
+PROPERTIES
+--
++ Vec3 NextLocation()
+
+--
+METHODS
+--
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLPackage</id><coordinates><x>280</x><y>482</y><w>392</w><h>600</h></coordinates><panel_attributes>MechPrefab
+--
+bg=transparent</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>296</x><y>522</y><w>176</w><h>24</h></coordinates><panel_attributes>&lt;&lt;NavMeshAgent&gt;&gt;</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>296</x><y>554</y><w>176</w><h>24</h></coordinates><panel_attributes>&lt;&lt;RigidBody&gt;&gt;</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>296</x><y>586</y><w>176</w><h>24</h></coordinates><panel_attributes>&lt;&lt;Collider&gt;&gt;</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>296</x><y>618</y><w>176</w><h>112</h></coordinates><panel_attributes>&lt;&lt;StateMachine&gt;&gt;
+--
+# - MechType
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLUseCase</id><coordinates><x>296</x><y>18</y><w>296</w><h>232</h></coordinates><panel_attributes>Mech AI
+
+--
+1. Handle Patrols
+2. Handle automation (interactions with other mechs or diff factions)
+3. Handle Player Commands (</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLUseCase</id><coordinates><x>744</x><y>34</y><w>296</w><h>232</h></coordinates><panel_attributes>StateMachine
+--
+IDLE
+PATROL
+CHASING
+ENGAGING
+</panel_attributes><additional_attributes></additional_attributes></element></diagram>

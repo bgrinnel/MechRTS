@@ -7,57 +7,57 @@ public class Weapon : MonoBehaviour
     [SerializeField]
     private WeaponScriptable weaponStats;
     [SerializeField]
-    private float weaponRange
+    public float weaponRange
     {
         get { return weaponStats.weaponRange; }
-        set { weaponStats.weaponRange = value; }
+        private set { weaponStats.weaponRange = value; }
     }
     [SerializeField]
-    private float weaponDamage
+    public float weaponDamage
     {
         get { return weaponStats.weaponDamage; }
-        set { weaponStats.weaponDamage = value; }
+        private set { weaponStats.weaponDamage = value; }
     }
     [SerializeField]
-    private float weaponSalvoReload
+    public float weaponSalvoReload
     {
         get { return weaponStats.weaponSalvoReload; }
-        set { weaponStats.weaponDamage = value; }
+        private set { weaponStats.weaponDamage = value; }
     }
 
     [SerializeField]
-    private float weaponSalvoLength
+    public float weaponSalvoLength
     {
         get { return weaponStats.weaponSalvoLength; }
-        set { weaponStats.weaponDamage = value; }
+        private set { weaponStats.weaponDamage = value; }
     }
 
     [SerializeField]
-    private float weaponShotReload
+    public float weaponShotReload
     {
         get { return weaponStats.weaponShotReload; }
-        set { weaponStats.weaponDamage = value; }
+        private set { weaponStats.weaponDamage = value; }
     }
 
     [SerializeField]
-    private WeaponScriptable.WeaponType weaponType
+    public WeaponScriptable.WeaponType weaponType
     {
         get { return weaponStats.weaponType; }
-        set { weaponStats.weaponType = value; }
+        private set { weaponStats.weaponType = value; }
     }
 
     [SerializeField]
-    private int ammo
+    public int ammo
     {
         get { return weaponStats.ammo; }
-        set { weaponStats.ammo = value; }
+        private set { weaponStats.ammo = value; }
     }
 
     [SerializeField]
-    private bool homing
+    public bool homing
     {
         get { return weaponStats.homing; }
-        set { weaponStats.homing = value; }
+        private set { weaponStats.homing = value; }
     }
 
     public IEnumerator Fire(GameObject target = null)
