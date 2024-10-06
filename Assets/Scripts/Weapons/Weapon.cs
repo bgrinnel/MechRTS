@@ -60,8 +60,21 @@ public class Weapon : MonoBehaviour
         private set { weaponStats.homing = value; }
     }
 
+    public GameObject target;
+    private bool reload = true;
+
+    private void Update()
+    {
+        if (target != null && weaponType == WeaponScriptable.WeaponType.Missile && reload)
+        {
+            StartCoroutine(Fire(target));
+        }
+    }
+
     public IEnumerator Fire(GameObject target = null)
     {
+        Debug.Log("Fire");
+        reload = false;
         for (int i = 0; i < weaponStats.weaponSalvoLength; i++) 
         {
             switch (weaponType)
@@ -82,20 +95,26 @@ public class Weapon : MonoBehaviour
             }
         }
         yield return new WaitForSeconds(weaponStats.weaponSalvoReload);
+        reload = true;
     }
 
     private void KeneticSalvo()
     {
-        var projectile = Instantiate(weaponStats.projectilePrefab);
+        var projectile = Instantiate(weaponStats.projectilePrefab, transform.position,transform.rotation);
         projectile.GetComponent<Projectile>().SetMode(0);
         projectile.GetComponent<Projectile>().InitializeProjectile(weaponDamage, weaponStats.projectileSpeed);
     }
 
     private void MissileSalvo(GameObject target = null)
     {
-        var missile = Instantiate(weaponStats.projectilePrefab);
+        var missile = Instantiate(weaponStats.projectilePrefab, transform.position, transform.rotation);
         missile.GetComponent<Projectile>().SetMode(1, homing);
         missile.GetComponent<Projectile>().InitializeProjectile(weaponDamage, weaponStats.projectileSpeed, target);
+        if (homing)
+        {
+            Debug.Log("Homing");
+            missile.GetComponent<Projectile>().InitializeHoming(weaponStats.minDistancePredict, weaponStats.minDistancePredict, weaponStats.maxTimePrediction, weaponStats.projectileRotationSpeed);
+        }
     }
 
     private void DirectEffect(GameObject target = null)
@@ -106,5 +125,10 @@ public class Weapon : MonoBehaviour
     private void Area()
     {
 
+    }
+
+    public void SetTarget(GameObject designatedTarget)
+    {
+        target = designatedTarget;
     }
 }

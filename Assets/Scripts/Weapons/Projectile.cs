@@ -42,13 +42,13 @@ public class Projectile : MonoBehaviour
     private void Missile()
     {
         Rigidbody rb = GetComponent<Rigidbody>();
-        rb.velocity = Vector3.forward * _speed;
+        rb.velocity = transform.forward * _speed;
     }
 
     private void HomingMissile()
     {
         Rigidbody rb = GetComponent<Rigidbody>();
-        rb.velocity = Vector3.forward * _speed;
+        rb.velocity = transform.forward * _speed;
 
         var leadTimePercentage = Mathf.InverseLerp(_minDistancePredict, _maxDistancePredict, Vector3.Distance(transform.position, _target.transform.position));
 
@@ -61,7 +61,7 @@ public class Projectile : MonoBehaviour
     private void KeneticWeapons()
     {
         Rigidbody rb = GetComponent<Rigidbody>();
-        rb.velocity = Vector3.forward * _speed;
+        rb.velocity = transform.forward * _speed;
     }
     public void SetMode(int mode, bool homing = false)
     {
@@ -76,11 +76,12 @@ public class Projectile : MonoBehaviour
         _target = target;
     }
 
-    public void InitializeHoming(float minPredictionDistance, float maxPredictionDistance, float maxTimePrediction)
+    public void InitializeHoming(float minPredictionDistance, float maxPredictionDistance, float maxTimePrediction, float rotationSpeed)
     {
         _minDistancePredict = minPredictionDistance;
         _maxDistancePredict = maxPredictionDistance;
         _maxTimePrediction = maxTimePrediction;
+        _projectileRotationSpeed = rotationSpeed;
     }
     private void PredictMovement(float leadTimePercentage)
     {
@@ -96,6 +97,7 @@ public class Projectile : MonoBehaviour
         var predictionOffset = transform.TransformDirection(deviation) * _deviationAmount * leadTimePercentage;
 
         _deviatedPrediction = _standardPrediction + predictionOffset;
+        Debug.Log(_deviatedPrediction);
     }
 
     private void RotateRocket()
