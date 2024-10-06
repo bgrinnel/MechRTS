@@ -60,20 +60,28 @@ public class Weapon : MonoBehaviour
         set { weaponStats.homing = value; }
     }
 
-    public void Fire(GameObject target = null)
+    public IEnumerator Fire(GameObject target = null)
     {
-        switch (weaponType)
+        for (int i = 0; i < weaponStats.weaponSalvoLength; i++) 
         {
-            case WeaponScriptable.WeaponType.DirectEffect:
-                break;
-            case WeaponScriptable.WeaponType.Kenetic:
-                KeneticSalvo();
-                break;
-            case WeaponScriptable.WeaponType.Missile:
-                if (homing) {MissileSalvo(target); }
-                else { MissileSalvo(); }
-                break;
+            switch (weaponType)
+            {
+                case WeaponScriptable.WeaponType.DirectEffect:
+                    break;
+                case WeaponScriptable.WeaponType.Kenetic:
+                    KeneticSalvo();
+                    break;
+                case WeaponScriptable.WeaponType.Missile:
+                    if (homing) { MissileSalvo(target); }
+                    else { MissileSalvo(); }
+                    break;
+            }
+            if(i < weaponStats.weaponSalvoLength - 1)
+            {
+                yield return new WaitForSeconds(weaponStats.weaponShotReload);
+            }
         }
+        yield return new WaitForSeconds(weaponStats.weaponSalvoReload);
     }
 
     private void KeneticSalvo()

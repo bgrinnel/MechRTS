@@ -11,7 +11,7 @@ public class WeaponScriptable : ScriptableObject
     public float weaponRange;
     public float weaponDamage;
     public float weaponSalvoReload;
-    public float weaponSalvoLength;
+    public int weaponSalvoLength;
     public float weaponShotReload;
     public int ammo;
     public bool homing;
