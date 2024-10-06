@@ -97,7 +97,6 @@ public class Projectile : MonoBehaviour
         var predictionOffset = transform.TransformDirection(deviation) * _deviationAmount * leadTimePercentage;
 
         _deviatedPrediction = _standardPrediction + predictionOffset;
-        Debug.Log(_deviatedPrediction);
     }
 
     private void RotateRocket()
