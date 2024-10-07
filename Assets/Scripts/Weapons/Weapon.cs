@@ -67,10 +67,7 @@ public class Weapon : MonoBehaviour
 
     private void Update()
     {
-        if (target != null && weaponType == WeaponScriptable.WeaponType.Missile && reload)
-        {
-            StartCoroutine(Fire(target));
-        }
+        
     }
 
     public IEnumerator Fire(GameObject target = null)
