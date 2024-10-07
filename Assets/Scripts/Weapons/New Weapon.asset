@@ -13,16 +13,16 @@ MonoBehaviour:
   m_Name: New Weapon
   m_EditorClassIdentifier: 
   weaponType: 1
-  weaponRange: 0
-  weaponDamage: 0
-  weaponSalvoReload: 0
-  weaponSalvoLength: 0
+  weaponRange: 800
+  weaponDamage: 15
+  weaponSalvoReload: 3
+  weaponSalvoLength: 1
   weaponShotReload: 0
-  ammo: 0
-  homing: 0
-  projectilePrefab: {fileID: 0}
-  projectileSpeed: 0
-  projectileRotationSpeed: 0
+  ammo: 4
+  homing: 1
+  projectilePrefab: {fileID: 8052185752214548017, guid: 08a4e081dc8e9bb49a57264f3cf3295c, type: 3}
+  projectileSpeed: 40
+  projectileRotationSpeed: 40
   maxDistancePredict: 100
   minDistancePredict: 5
-  maxTimePrediction: 5
+  maxTimePrediction: 6
