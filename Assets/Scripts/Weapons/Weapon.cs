@@ -5,6 +5,8 @@ using UnityEngine;
 public class Weapon : MonoBehaviour
 {
     [SerializeField]
+    private MechBehavior owningMech;
+    [SerializeField]
     private WeaponScriptable weaponStats;
     [SerializeField]
     public float weaponRange
@@ -80,6 +82,7 @@ public class Weapon : MonoBehaviour
             switch (weaponType)
             {
                 case WeaponScriptable.WeaponType.DirectEffect:
+                    DirectEffect(target);
                     break;
                 case WeaponScriptable.WeaponType.Kenetic:
                     KeneticSalvo();
@@ -102,24 +105,23 @@ public class Weapon : MonoBehaviour
     {
         var projectile = Instantiate(weaponStats.projectilePrefab, transform.position,transform.rotation);
         projectile.GetComponent<Projectile>().SetMode(0);
-        projectile.GetComponent<Projectile>().InitializeProjectile(weaponDamage, weaponStats.projectileSpeed);
+        projectile.GetComponent<Projectile>().InitializeProjectile(weaponDamage, weaponStats.projectileSpeed, owningMech);
     }
 
     private void MissileSalvo(GameObject target = null)
     {
         var missile = Instantiate(weaponStats.projectilePrefab, transform.position, transform.rotation);
         missile.GetComponent<Projectile>().SetMode(1, homing);
-        missile.GetComponent<Projectile>().InitializeProjectile(weaponDamage, weaponStats.projectileSpeed, target);
+        missile.GetComponent<Projectile>().InitializeProjectile(weaponDamage, weaponStats.projectileSpeed, owningMech, target);
         if (homing)
         {
-            Debug.Log("Homing");
             missile.GetComponent<Projectile>().InitializeHoming(weaponStats.minDistancePredict, weaponStats.minDistancePredict, weaponStats.maxTimePrediction, weaponStats.projectileRotationSpeed);
         }
     }
 
-    private void DirectEffect(GameObject target = null)
+    private void DirectEffect(GameObject target)
     {
-
+        owningMech.HitMech(target.gameObject.GetComponent<MechBehavior>(), weaponDamage);
     }
 
     private void Area()
@@ -130,5 +132,19 @@ public class Weapon : MonoBehaviour
     public void SetTarget(GameObject designatedTarget)
     {
         target = designatedTarget;
+    }
+
+    public Weapon (WeaponScriptable scriptable, MechBehavior mech)
+    {
+        owningMech = mech;
+        weaponStats = scriptable;
+        weaponRange = scriptable.weaponRange;
+        weaponDamage = scriptable.weaponDamage;
+        weaponSalvoReload = scriptable.weaponSalvoReload;
+        weaponSalvoLength = scriptable.weaponSalvoLength;
+        weaponShotReload = scriptable.weaponShotReload;
+        weaponType = scriptable.weaponType;
+        ammo = scriptable.ammo;
+        homing = scriptable.homing;
     }
 }

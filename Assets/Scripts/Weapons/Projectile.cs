@@ -12,6 +12,7 @@ public class Projectile : MonoBehaviour
     private bool _homing;
     private float _damage, _speed, _maxDistancePredict, _minDistancePredict, _maxTimePrediction, _projectileRotationSpeed;
     private Vector3 _standardPrediction, _deviatedPrediction;
+    private MechBehavior _owningMech;
     [SerializeField] private float _deviationAmount = 50;
     [SerializeField] private float _deviationSpeed = 2;
 
@@ -69,11 +70,13 @@ public class Projectile : MonoBehaviour
         _homing = homing;
     }
 
-    public void InitializeProjectile(float damage, float speed, GameObject target = null)
+    public void InitializeProjectile(float damage, float speed, MechBehavior owningMech,GameObject target = null)
     {
         _damage = damage;
         _speed = speed;
         _target = target;
+        _owningMech = owningMech;
+        gameObject.layer = owningMech.gameObject.layer;
     }
 
     public void InitializeHoming(float minPredictionDistance, float maxPredictionDistance, float maxTimePrediction, float rotationSpeed)
@@ -109,4 +112,9 @@ public class Projectile : MonoBehaviour
         rb.MoveRotation(Quaternion.RotateTowards(transform.rotation, rotation, _projectileRotationSpeed * Time.deltaTime));
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        _owningMech.HitMech(other.gameObject.GetComponent<MechBehavior>(), _damage);
+        Destroy(this.gameObject);
+    }
 }
