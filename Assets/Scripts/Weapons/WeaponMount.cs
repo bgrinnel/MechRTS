@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class WeaponMount : MonoBehaviour
 {
-    public float
+   // public float
     public WeaponMount(WeaponMountScriptable weaponMountStats, WeaponScriptable scriptable)
     {
 

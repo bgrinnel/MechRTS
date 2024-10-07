@@ -10,7 +10,7 @@ public class RTSController : MonoBehaviour
     [SerializeField] private LayerMask unitLayerMask;
     [SerializeField] private LayerMask backgroundLayerMask;
     [SerializeField] private LayerMask enemyLayerMask;
-    [SerializeField] private float clickThreshold = 0.5f; // To distinguish between click and drag
+    [SerializeField] private float clickThreshold = 80.5f; // To distinguish between click and drag
 
     private Vector2 startPos;
     [SerializeField] CameraController camState;
@@ -35,7 +35,7 @@ public class RTSController : MonoBehaviour
     }
     private void Start()
     {
-        selectionBox.gameObject.SetActive(false);
+//        selectionBox.gameObject.SetActive(false);
     }
     void Update()
     {
@@ -50,7 +50,7 @@ public class RTSController : MonoBehaviour
             // CheckButtonPressed
             startPos = Input.mousePosition;
             isDragging = false;
-            selectionBox.gameObject.SetActive(false); // Hide Selection box initially
+            //selectionBox.gameObject.SetActive(false); // Hide Selection box initially
         }
 
         if (Input.GetMouseButton(0))
@@ -59,7 +59,7 @@ public class RTSController : MonoBehaviour
             if (Vector2.Distance(startPos, Input.mousePosition) > clickThreshold)
             {
                 isDragging = true;
-                selectionBox.gameObject.SetActive(true);
+                //selectionBox.gameObject.SetActive(true);
                 UpdateSelectionBox(startPos, Input.mousePosition);
             }
         }
@@ -69,7 +69,7 @@ public class RTSController : MonoBehaviour
             if (isDragging)
             {
                 // Finish drag selection
-                selectionBox.gameObject.SetActive(false);
+                //selectionBox.gameObject.SetActive(false);
                 SelectUnitsWithinBox();
                 isDragging = false;
             }
@@ -100,10 +100,10 @@ public class RTSController : MonoBehaviour
     void UpdateSelectionBox(Vector2 start, Vector2 end)
     {
         Vector2 center = (start + end) / 2;
-        selectionBox.position = center;
+        //selectionBox.position = center;
 
         Vector2 size = new Vector2(Mathf.Abs(start.x - end.x), Mathf.Abs(start.y - end.y));
-        selectionBox.sizeDelta = size;
+        //selectionBox.sizeDelta = size;
     }
 
     void SelectUnitsWithinBox()
@@ -148,7 +148,7 @@ public class RTSController : MonoBehaviour
             DeSelectAll();
             // Handle deselection if needed
         }
-        transform.position = worldPos;
+        //transform.position = worldPos;
     
         /*
         Vector3 screenPosition = Input.mousePosition;
