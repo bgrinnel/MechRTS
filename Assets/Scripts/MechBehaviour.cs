@@ -18,6 +18,9 @@ public class MechBehavior : MonoBehaviour
     private NavMeshAgent _navMeshAgent;
     [HideInInspector] public CombatBehaviour combatBehaviour;
     private Collider _collider;
+
+    // children
+    private MeshRenderer selectionPulse;
     
     // actually class properties
     [SerializeField] private MechType _type;
@@ -73,6 +76,7 @@ public class MechBehavior : MonoBehaviour
     /// Never set this variable directly, always use SetState()
     /// </summary>
     private EState _state;
+    public MechStateChange stateChange;
     private float _stateDuration;
     private EState _statePrev; 
     private int _aggroLayer;
@@ -87,7 +91,6 @@ public class MechBehavior : MonoBehaviour
     private bool _bTargetSet;
 
     private Weapon[] _weapons;
-    public MechStateChange stateChange;
 
     void Awake()
     {
@@ -121,6 +124,8 @@ public class MechBehavior : MonoBehaviour
         gameObject.tag = "Mech";
         _weapons = System.Array.Empty<Weapon>();
         SetState( HasPatrol() ? EState.Patroling : EState.Idle);
+        selectionPulse = transform.GetChild(0).GetComponent<MeshRenderer>();
+        SetIsSelected(false);
     }
 
     void Start()
@@ -375,5 +380,11 @@ public class MechBehavior : MonoBehaviour
     public void HitMech(MechBehavior mech, float damage)
     {
         CombatBehaviour.CombatEvent(combatBehaviour, mech.combatBehaviour, TCombatContext.BasicAttack(damage));
+    }
+
+    public bool IsSelected() { return selectionPulse.enabled; } 
+    public void SetIsSelected(bool isSelected)
+    {
+        selectionPulse.enabled = isSelected;
     }
 }

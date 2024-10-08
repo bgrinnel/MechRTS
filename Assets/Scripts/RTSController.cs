@@ -121,12 +121,13 @@ public class RTSController : MonoBehaviour
        //Debug.Log("size " + size);
         var unitsBoxed = Physics.OverlapBox(center,size , Quaternion.identity, unitLayerMask);
         //var unitsBoxed = Physics2D.OverlapAreaAll(start, end);
-        if (!_shiftPressed) { _selectedUnits.Clear(); }
+        if (!_shiftPressed) { DeSelectAll(); }
         foreach (var unit in _playerUnits)
         {
             if (!_selectedUnits.Contains(unit.gameObject))
             {
                 _selectedUnits.Add(unit.gameObject);
+                unit.GetComponent<MechBehavior>().SetIsSelected(true);
             }
         }
     }
@@ -159,6 +160,7 @@ public class RTSController : MonoBehaviour
         transform.position = hit.point;
         */
     }
+
     void RightMouseClick()
     {
         screenPos = Input.mousePosition;
@@ -181,6 +183,7 @@ public class RTSController : MonoBehaviour
     {
         if (!_shiftPressed) { _selectedUnits.Clear(); }
         _selectedUnits.Add(unit);
+        unit.GetComponent<MechBehavior>().SetIsSelected(true);
     }
     public List<GameObject> Selected()
     {
@@ -192,11 +195,13 @@ public class RTSController : MonoBehaviour
         if (_selectedUnits.Contains(unit))
         {
             _selectedUnits.Remove(unit);
+            unit.GetComponent<MechBehavior>().SetIsSelected(false);
         }
     }
 
     public void DeSelectAll()
     {
+        foreach (var unit in _selectedUnits) unit.GetComponent<MechBehavior>().SetIsSelected(false);
         _selectedUnits.Clear();
     }
 
@@ -213,12 +218,14 @@ public class RTSController : MonoBehaviour
 
     public void CallControlGroups(int grounpnumber)
     {
-        _selectedUnits.Clear();
+        DeSelectAll();
 
         foreach (var unit in unitGroups[grounpnumber])
         {
             if (unit != null && !_selectedUnits.Contains(unit))
             {
+                
+                unit.GetComponent<MechBehavior>().SetIsSelected(true);
                 _selectedUnits.Add(unit);
             }
         }
