@@ -6,19 +6,8 @@ using UnityEngine.UIElements;
 
 public class WeaponMount : MonoBehaviour
 {
-    private GameObject _target;
-    private float _leftRotationLimit;
-    private float _rightRotationLimit;
-    private float _rotationSpeed;
-    private Weapon _mountedWeapon;
-    private MechBehavior _mechBehavior;
-
-    private void Update()
-    {
-        
-    }
-
-    private void Aim(GameObject target)
+   // public float
+    public WeaponMount(WeaponMountScriptable weaponMountStats, WeaponScriptable scriptable)
     {
         Vector3 targetPosition = new Vector3(0,0,0);
         if((_mountedWeapon.weaponType == WeaponScriptable.WeaponType.Missile || _mountedWeapon.weaponType == WeaponScriptable.WeaponType.Kenetic) && !_mountedWeapon.homing)
