@@ -14,10 +14,10 @@ public class MainMenuScript : MonoBehaviour
     [SerializeField]
     private GameObject settingsMenu;
 
-    [SerializeField] private SceneAsset survivalScene;
+    //[SerializeField] private Scene survivalScene;
     public void PlayButton()
     {
-        SceneManager.LoadScene(survivalScene.name, LoadSceneMode.Single);
+        SceneManager.LoadScene("TestScene", LoadSceneMode.Single);
     }
     public void SettingsButton()
     {
