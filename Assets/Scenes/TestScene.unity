@@ -134,13 +134,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 12724863}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a0ace3fd8904f7c44a3e9e0c899f0aff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerMat: {fileID: 0}
-  enemyMat: {fileID: 0}
+  playerMat: {fileID: 2100000, guid: 64d54d0f4fbaea84fa2360ac7f9d5c55, type: 2}
+  enemyMat: {fileID: 2100000, guid: fc45c13fd017e92479b09d6ec48038d7, type: 2}
   mech: {fileID: 12724875}
   navAgent: {fileID: 0}
   navPath: []
@@ -178,13 +178,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 106496197}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a0ace3fd8904f7c44a3e9e0c899f0aff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerMat: {fileID: 0}
-  enemyMat: {fileID: 0}
+  playerMat: {fileID: 2100000, guid: 64d54d0f4fbaea84fa2360ac7f9d5c55, type: 2}
+  enemyMat: {fileID: 2100000, guid: fc45c13fd017e92479b09d6ec48038d7, type: 2}
   mech: {fileID: 106496200}
   navAgent: {fileID: 0}
   navPath: []
@@ -260,6 +260,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4908464926973703656, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: fc45c13fd017e92479b09d6ec48038d7, type: 2}
     - target: {fileID: 7284709147818942656, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: _type
       value: 
@@ -338,7 +342,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: a4ab755eaaeadc74ca2425c1391613d4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -462,6 +466,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4908464926973703656, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: fc45c13fd017e92479b09d6ec48038d7, type: 2}
     - target: {fileID: 8535662026463818939, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_Name
       value: Enemy1
@@ -546,6 +554,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4908464926973703656, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 64d54d0f4fbaea84fa2360ac7f9d5c55, type: 2}
     - target: {fileID: 7284709147818942656, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: _type
       value: 
@@ -582,13 +594,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1335080255}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a0ace3fd8904f7c44a3e9e0c899f0aff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerMat: {fileID: 0}
-  enemyMat: {fileID: 0}
+  playerMat: {fileID: 2100000, guid: 64d54d0f4fbaea84fa2360ac7f9d5c55, type: 2}
+  enemyMat: {fileID: 2100000, guid: fc45c13fd017e92479b09d6ec48038d7, type: 2}
   mech: {fileID: 1335080267}
   navAgent: {fileID: 0}
   navPath: []
@@ -654,7 +666,7 @@ PrefabInstance:
     - target: {fileID: 4908464926973703656, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 2100000, guid: 64d54d0f4fbaea84fa2360ac7f9d5c55, type: 2}
     - target: {fileID: 7284709147818942656, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: _isPlayer
       value: 1
@@ -698,13 +710,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1682468703}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a0ace3fd8904f7c44a3e9e0c899f0aff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerMat: {fileID: 0}
-  enemyMat: {fileID: 0}
+  playerMat: {fileID: 2100000, guid: 64d54d0f4fbaea84fa2360ac7f9d5c55, type: 2}
+  enemyMat: {fileID: 2100000, guid: fc45c13fd017e92479b09d6ec48038d7, type: 2}
   mech: {fileID: 1682468706}
   navAgent: {fileID: 0}
   navPath: []

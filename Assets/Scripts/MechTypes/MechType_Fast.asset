@@ -26,4 +26,5 @@ MonoBehaviour:
   angularDrag: 10
   sightRange: 40
   hearingRange: 80
-  WeaponTypes: []
+  WeaponTypes:
+  - {fileID: 11400000, guid: ec8f6b554220b094e81fe2cc442b62c9, type: 2}

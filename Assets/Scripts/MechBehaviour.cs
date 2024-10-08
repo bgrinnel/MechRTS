@@ -250,6 +250,7 @@ public class MechBehavior : MonoBehaviour
     private void SetState(EState newState)
     {
         Debug.Log($"\"{gameObject.name}\" is now \"{newState}\"");
+        if (newState == _state) return;
         _statePrev = _state;
         _state = newState;
         stateChange?.Invoke(_state, _statePrev, _stateDuration);
