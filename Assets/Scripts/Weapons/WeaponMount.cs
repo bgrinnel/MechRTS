@@ -14,6 +14,8 @@ public class WeaponMount : MonoBehaviour
     private float _rotationSpeed;
     [SerializeField]
     private Weapon _mountedWeapon;
+
+    public GameObject _target;
    // public float
     public void Aim()
     {
