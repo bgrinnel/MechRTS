@@ -39,6 +39,6 @@ public class WeaponMount : MonoBehaviour
         _leftRotationLimit = weaponMountStats.leftRorationLimit;
         _rightRotationLimit = weaponMountStats.rightRorationLimit;
         _rotationSpeed = weaponMountStats.rorationSpeed;
-        _mountedWeapon = new Weapon(scriptable, _mechBehavior);
+        // _mountedWeapon = new Weapon(scriptable, _mechBehavior);
     }
 }

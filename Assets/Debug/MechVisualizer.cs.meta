@@ -4,8 +4,8 @@ MonoImporter:
   externalObjects: {}
   serializedVersion: 2
   defaultReferences:
-  - playerMat: {fileID: 2100000, guid: a4ab755eaaeadc74ca2425c1391613d4, type: 2}
-  - enemyMat: {fileID: 2100000, guid: d9909b27a47829b4abd2803870e3a752, type: 2}
+  - playerMat: {fileID: 2100000, guid: 64d54d0f4fbaea84fa2360ac7f9d5c55, type: 2}
+  - enemyMat: {fileID: 2100000, guid: fc45c13fd017e92479b09d6ec48038d7, type: 2}
   - mech: {instanceID: 0}
   - navAgent: {instanceID: 0}
   executionOrder: 0

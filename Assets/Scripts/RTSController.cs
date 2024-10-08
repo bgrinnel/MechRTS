@@ -10,7 +10,7 @@ public class RTSController : MonoBehaviour
     [SerializeField] private LayerMask unitLayerMask;
     [SerializeField] private LayerMask backgroundLayerMask;
     [SerializeField] private LayerMask enemyLayerMask;
-    [SerializeField] private float clickThreshold = 80.5f; // To distinguish between click and drag
+    [SerializeField] private float clickThreshold = 20f; // To distinguish between click and drag
 
     private Vector2 startPos;
     [SerializeField] CameraController camState;
@@ -35,7 +35,7 @@ public class RTSController : MonoBehaviour
     }
     private void Start()
     {
-//        selectionBox.gameObject.SetActive(false);
+        selectionBox.gameObject.SetActive(false);
     }
     void Update()
     {
@@ -71,6 +71,7 @@ public class RTSController : MonoBehaviour
                 // Finish drag selection
                 //selectionBox.gameObject.SetActive(false);
                 SelectUnitsWithinBox();
+				selectionBox.gameObject.SetActive(false);
                 isDragging = false;
             }
             else
@@ -99,16 +100,22 @@ public class RTSController : MonoBehaviour
     }
     void UpdateSelectionBox(Vector2 start, Vector2 end)
     {
-        Vector2 center = (start + end) / 2;
-        //selectionBox.position = center;
-
+        //Turn on the selectionBox if not yet active
+		if(!selectionBox.gameObject.activeInHierarchy)
+        selectionBox.gameObject.SetActive(true);
+	
+        //Vector2 center = (start + end) / 2;
+		
+		//Get new size of rectangle and update its center using anchored position
         Vector2 size = new Vector2(Mathf.Abs(start.x - end.x), Mathf.Abs(start.y - end.y));
-        //selectionBox.sizeDelta = size;
+        
+		selectionBox.sizeDelta = size;
+		selectionBox.anchoredPosition = startPos + new Vector2((end.x - start.x)/2, (end.y - start.y)/2);
     }
 
     void SelectUnitsWithinBox()
     {
-
+		/*
         Vector3 start = Camera.main.ScreenToWorldPoint(new Vector3(startPos.x, startPos.y, Camera.main.transform.position.z)) * -1;
         Vector3 end = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.transform.position.z)) * -1;
        
@@ -121,14 +128,30 @@ public class RTSController : MonoBehaviour
        //Debug.Log("size " + size);
         var unitsBoxed = Physics.OverlapBox(center,size , Quaternion.identity, unitLayerMask);
         //var unitsBoxed = Physics2D.OverlapAreaAll(start, end);
-        if (!_shiftPressed) { _selectedUnits.Clear(); }
+        if (!_shiftPressed) { DeSelectAll(); }
         foreach (var unit in _playerUnits)
         {
             if (!_selectedUnits.Contains(unit.gameObject))
             {
                 _selectedUnits.Add(unit.gameObject);
+                unit.GetComponent<MechBehavior>().SetIsSelected(true);
             }
         }
+		*/
+		Vector2 min = selectionBox.anchoredPosition - (selectionBox.sizeDelta / 2);
+		Vector2 max = selectionBox.anchoredPosition + (selectionBox.sizeDelta / 2);
+		
+		if (!_shiftPressed) { _selectedUnits.Clear(); }
+		
+		foreach(var unit in _playerUnits)
+		{
+			Vector3 screenPos = Camera.main.WorldToScreenPoint(unit.transform.position);
+        
+			if(screenPos.x > min.x && screenPos.x < max.x && screenPos.y > min.y && screenPos.y < max.y)
+			{
+				_selectedUnits.Add(unit.gameObject);
+			}
+		}
     }
 
     void SelectSingleUnit()
@@ -159,6 +182,7 @@ public class RTSController : MonoBehaviour
         transform.position = hit.point;
         */
     }
+
     void RightMouseClick()
     {
         screenPos = Input.mousePosition;
@@ -181,6 +205,7 @@ public class RTSController : MonoBehaviour
     {
         if (!_shiftPressed) { _selectedUnits.Clear(); }
         _selectedUnits.Add(unit);
+        unit.GetComponent<MechBehavior>().SetIsSelected(true);
     }
     public List<GameObject> Selected()
     {
@@ -192,11 +217,13 @@ public class RTSController : MonoBehaviour
         if (_selectedUnits.Contains(unit))
         {
             _selectedUnits.Remove(unit);
+            unit.GetComponent<MechBehavior>().SetIsSelected(false);
         }
     }
 
     public void DeSelectAll()
     {
+        foreach (var unit in _selectedUnits) unit.GetComponent<MechBehavior>().SetIsSelected(false);
         _selectedUnits.Clear();
     }
 
@@ -213,12 +240,14 @@ public class RTSController : MonoBehaviour
 
     public void CallControlGroups(int grounpnumber)
     {
-        _selectedUnits.Clear();
+        DeSelectAll();
 
         foreach (var unit in unitGroups[grounpnumber])
         {
             if (unit != null && !_selectedUnits.Contains(unit))
             {
+                
+                unit.GetComponent<MechBehavior>().SetIsSelected(true);
                 _selectedUnits.Add(unit);
             }
         }
