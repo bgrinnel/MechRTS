@@ -141,7 +141,7 @@ public class RTSController : MonoBehaviour
 		Vector2 min = selectionBox.anchoredPosition - (selectionBox.sizeDelta / 2);
 		Vector2 max = selectionBox.anchoredPosition + (selectionBox.sizeDelta / 2);
 		
-		if (!_shiftPressed) { _selectedUnits.Clear(); }
+		if (!_shiftPressed) { DeSelectAll(); }
 		
 		foreach(var unit in _playerUnits)
 		{
@@ -149,7 +149,7 @@ public class RTSController : MonoBehaviour
         
 			if(screenPos.x > min.x && screenPos.x < max.x && screenPos.y > min.y && screenPos.y < max.y)
 			{
-				_selectedUnits.Add(unit.gameObject);
+				Select(unit);
 			}
 		}
     }
@@ -203,10 +203,10 @@ public class RTSController : MonoBehaviour
     
     public void Select(GameObject unit)
     {
-        if (!_shiftPressed) { _selectedUnits.Clear(); }
         _selectedUnits.Add(unit);
         unit.GetComponent<MechBehavior>().SetIsSelected(true);
     }
+
     public List<GameObject> Selected()
     {
         return(_selectedUnits);
@@ -246,9 +246,7 @@ public class RTSController : MonoBehaviour
         {
             if (unit != null && !_selectedUnits.Contains(unit))
             {
-                
-                unit.GetComponent<MechBehavior>().SetIsSelected(true);
-                _selectedUnits.Add(unit);
+                Select(unit);
             }
         }
     }
