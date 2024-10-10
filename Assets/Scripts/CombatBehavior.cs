@@ -7,16 +7,16 @@ using UnityEngine;
 /// </summary>
 public class CombatBehaviour : MonoBehaviour
 {
-    public delegate void Message();
+    public delegate void Message(TCombatContext context);
 
-    public delegate void AgentMessage(CombatBehaviour agent);
+    public delegate void AgentMessage(CombatBehaviour agent, TCombatContext context);
 
     /// <summary>
     /// The base delegate definition for all CombatProperty related events, allows for modification of the property
     /// </summary>
     /// <param name="property"> the property that's been modified </param>
     /// <param name="container"> the (reference-of) container for that property at Invokation </param>
-    public delegate void PropertyChange(EPropertyType property, in TPropertyContainer container);
+    public delegate void PropertyChange(in TPropertyContainer container, TCombatContext context);
 
     /// <summary>
     /// The combat function, handles al
@@ -28,14 +28,17 @@ public class CombatBehaviour : MonoBehaviour
    {
         if (target == null) return;
         var target_health = target.GetHealth();
-        if (target_health.Current <= target_health.Min) return;
+        if (target_health.current <= target_health.min) return;
         
-        target_health.Current -= context.Damage.Current;
-        target_health = target.SetHealth(target_health.Current);
-        if (target_health.Current <= target_health.Min)
+        context.instigator = instigator;
+        context.target = target;
+        target_health.current -= context.damage.current;
+        target_health = target.SetHealth(target_health.current,  context);
+        Debug.Log($"{target.gameObject.name}'s Health fell to {target_health.current}");
+        if (target_health.current <= target_health.min)
         {
-            if (instigator != null) instigator.defeatedAgent?.Invoke(target);
-            target.death?.Invoke();
+            if (instigator != null) instigator.defeatedAgent?.Invoke(target, context);
+            target.death?.Invoke(context);
         }
    }
    
@@ -69,14 +72,14 @@ public class CombatBehaviour : MonoBehaviour
     
     public TPropertyContainer GetHealth() { return _healthContainer; }
 
-    public TPropertyContainer SetHealth(float newHealth) 
+    public TPropertyContainer SetHealth(float newHealth, TCombatContext context) 
     {
-        if (newHealth == _healthContainer.Current) return _healthContainer;
-        _healthContainer.Current = newHealth;
-        healthModified?.Invoke(EPropertyType.Health, _healthContainer);
-        if (_healthContainer.Current <= _healthContainer.Min)
+        if (newHealth == _healthContainer.current) return _healthContainer;
+        _healthContainer.current = newHealth;
+        healthModified?.Invoke(_healthContainer, context);
+        if (_healthContainer.current <= _healthContainer.min)
         {
-            healthDepleted?.Invoke(EPropertyType.Health, _healthContainer);
+            healthDepleted?.Invoke(_healthContainer, context);
         }
         return _healthContainer;
     }

@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e5eb62794592a95409fed85ae8e3770c, type: 3}
-  m_Name: MechType_Fast
+  m_Name: DemoPlayer
   m_EditorClassIdentifier: 
   maxHealth: 700
   agentType:
-    speed: 50
+    speed: 35
     angularSpeed: 480
     acceleration: 150
     stoppingDistance: 3
@@ -24,7 +24,7 @@ MonoBehaviour:
   mass: 1500
   drag: 5
   angularDrag: 10
-  sightRange: 40
-  hearingRange: 80
-  WeaponTypes:
-  - {fileID: 11400000, guid: ec8f6b554220b094e81fe2cc442b62c9, type: 2}
+  sightRange: 20
+  hearingRange: 100
+  weapons:
+  - {fileID: 11400000, guid: 89301543cf92d17468ed9432e459ce01, type: 2}
