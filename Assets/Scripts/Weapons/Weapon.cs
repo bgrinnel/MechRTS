@@ -6,8 +6,10 @@ public class Weapon : MonoBehaviour
 {
     [SerializeField]
     private MechBehavior owningMech;
+
     [SerializeField]
     private WeaponScriptable weaponStats;
+
     [SerializeField]
     public float weaponRange
     {
@@ -21,24 +23,24 @@ public class Weapon : MonoBehaviour
         private set { weaponStats.weaponDamage = value; }
     }
     [SerializeField]
-    public float weaponSalvoReload
+    public float SalvoReloadSec
     {
         get { return weaponStats.weaponSalvoReload; }
-        private set { weaponStats.weaponDamage = value; }
+        private set { weaponStats.weaponSalvoReload = value; }
     }
 
     [SerializeField]
-    public float weaponSalvoLength
+    public float SalvoLength
     {
         get { return weaponStats.weaponSalvoLength; }
-        private set { weaponStats.weaponDamage = value; }
+        private set { weaponStats.weaponSalvoLength = (int)value; }
     }
 
     [SerializeField]
-    public float weaponShotReload
+    public float ShotReloadSec
     {
         get { return weaponStats.weaponShotReload; }
-        private set { weaponStats.weaponDamage = value; }
+        private set { weaponStats.weaponShotReload = value; }
     }
 
     [SerializeField]
@@ -63,44 +65,49 @@ public class Weapon : MonoBehaviour
     }
 
     public GameObject target;
-    private bool reload = true;
+    private bool _isReloading;
+    private int _salvoIdx;
+    private Coroutine _reloadTimer;
 
-    private void Update()
+    public void Fire(GameObject target)
     {
-        
-    }
-
-    public IEnumerator Fire(GameObject target = null)
-    {
-        Debug.Log("Fire");
-        reload = false;
-        for (int i = 0; i < weaponStats.weaponSalvoLength; i++) 
+        // Debug.Log($"{weaponStats.name} firing");
+        if (_isReloading) return;
+        switch (weaponType)
         {
-            switch (weaponType)
-            {
-                case WeaponScriptable.WeaponType.DirectEffect:
-                    DirectEffect(target);
-                    break;
-                case WeaponScriptable.WeaponType.Kenetic:
-                    KeneticSalvo();
-                    break;
-                case WeaponScriptable.WeaponType.Missile:
-                    if (homing) { MissileSalvo(target); }
-                    else { MissileSalvo(); }
-                    break;
-            }
-            if(i < weaponStats.weaponSalvoLength - 1)
-            {
-                yield return new WaitForSeconds(weaponStats.weaponShotReload);
-            }
+            case WeaponScriptable.WeaponType.DirectEffect:
+                DirectEffect(target);
+                break;
+            case WeaponScriptable.WeaponType.Kenetic:
+                KeneticSalvo(target);
+                break;
+            case WeaponScriptable.WeaponType.Missile:
+                if (homing) { MissileSalvo(target); }
+                else { MissileSalvo(); }
+                break;
         }
-        yield return new WaitForSeconds(weaponStats.weaponSalvoReload);
-        reload = true;
+        if (++_salvoIdx < SalvoLength)
+        {
+            _reloadTimer = StartCoroutine(PauseWeaponFor(ShotReloadSec));
+        }
+        else
+        {
+            _salvoIdx = 0;
+            _reloadTimer = StartCoroutine(PauseWeaponFor(SalvoReloadSec));
+        }
     }
 
-    private void KeneticSalvo()
+    private IEnumerator PauseWeaponFor(float time)
+    {
+        _isReloading = true;
+        yield return new WaitForSeconds(time);
+        _isReloading = false;
+    }
+
+    private void KeneticSalvo(GameObject target)
     {
         var projectile = Instantiate(weaponStats.projectilePrefab, transform.position,transform.rotation);
+        projectile.transform.LookAt(target.transform);
         projectile.GetComponent<Projectile>().SetMode(0);
         projectile.GetComponent<Projectile>().InitializeProjectile(weaponDamage, weaponStats.projectileSpeed, owningMech);
     }
@@ -131,17 +138,19 @@ public class Weapon : MonoBehaviour
         target = designatedTarget;
     }
 
-    public Weapon (WeaponScriptable scriptable, MechBehavior mech)
+    public void Instantiate(WeaponScriptable scriptable, MechBehavior mech)
     {
         owningMech = mech;
         weaponStats = scriptable;
         weaponRange = scriptable.weaponRange;
         weaponDamage = scriptable.weaponDamage;
-        weaponSalvoReload = scriptable.weaponSalvoReload;
-        weaponSalvoLength = scriptable.weaponSalvoLength;
-        weaponShotReload = scriptable.weaponShotReload;
+        SalvoReloadSec = scriptable.weaponSalvoReload;
+        SalvoLength = scriptable.weaponSalvoLength;
+        ShotReloadSec = scriptable.weaponShotReload;
         weaponType = scriptable.weaponType;
         ammo = scriptable.ammo;
         homing = scriptable.homing;
+        _isReloading = false;
+        _salvoIdx = 0;
     }
 }
