@@ -22,11 +22,11 @@ public class WeaponMount : MonoBehaviour
         Vector3 targetPosition = new Vector3(0,0,0);
         if((_mountedWeapon.weaponType == WeaponScriptable.WeaponType.Missile || _mountedWeapon.weaponType == WeaponScriptable.WeaponType.Kenetic) && !_mountedWeapon.homing)
         {
-            targetPosition = _target.transform.position;
+            
         }
         else
         {
-
+            targetPosition = _target.transform.position;
         }
     }
 
@@ -40,5 +40,25 @@ public class WeaponMount : MonoBehaviour
         _rightRotationLimit = weaponMountStats.rightRorationLimit;
         _rotationSpeed = weaponMountStats.rorationSpeed;
         // _mountedWeapon = new Weapon(scriptable, _mechBehavior);
+    }
+
+    private Vector3 LeadPosition(Rigidbody owningMech, Rigidbody targetMech)
+    {
+        Vector3 ownPosition = owningMech.position;
+        Vector3 ownVelocity = owningMech.velocity;
+        Vector3 targetPosition = targetMech.position;
+        Vector3 targetVelocity = targetMech.velocity;
+
+        Vector3 displacement = targetPosition - ownPosition;
+        Vector3 relativeVelocity = targetVelocity - ownVelocity;
+
+        float distance = displacement.magnitude;
+        float relativeSpeed = relativeVelocity.magnitude;
+
+        float timeToImpact = distance / _mountedWeapon.weaponStats.projectileSpeed;
+
+        Vector3 predictionPosition = targetPosition + targetVelocity * timeToImpact;
+
+        return predictionPosition;
     }
 }
