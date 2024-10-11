@@ -62,16 +62,16 @@ public class MechType : ScriptableObject
     public SelectionAlgorithm selectionAlg = SelectionAlg.Closest;
 
     /// <summary>
-    /// A list of all the weapons this mech has
+    /// A list of all the weapons this mech has as Types
     /// </summary>
-    public List<WeaponScriptable> WeaponTypes;
+    public WeaponScriptable[] weapons;
 }
 
 public static class SelectionAlg
 {
     public static MechBehavior LowestHealth(MechBehavior selector, params MechBehavior[] mechs)
     {
-        return mechs.OrderBy((mech) => mech.combatBehaviour.GetHealth().Current).First();
+        return mechs.OrderBy((mech) => mech.combatBehaviour.GetHealth().current).First();
     }
     public static MechBehavior Closest(MechBehavior selector, params MechBehavior[] mechs)
     {

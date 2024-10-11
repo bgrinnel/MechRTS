@@ -1,9 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 public class Projectile : MonoBehaviour
 {
@@ -16,7 +11,7 @@ public class Projectile : MonoBehaviour
     [SerializeField] private float _deviationAmount = 50;
     [SerializeField] private float _deviationSpeed = 2;
 
-    private void Update()
+    private void FixedUpdate()
     {
         switch (_weaponModes)
         {
@@ -43,13 +38,13 @@ public class Projectile : MonoBehaviour
     private void Missile()
     {
         Rigidbody rb = GetComponent<Rigidbody>();
-        rb.velocity = transform.forward * _speed;
+        rb.velocity = _speed * transform.forward;
     }
 
     private void HomingMissile()
     {
         Rigidbody rb = GetComponent<Rigidbody>();
-        rb.velocity = transform.forward * _speed;
+        rb.velocity = _speed * transform.forward;
 
         var leadTimePercentage = Mathf.InverseLerp(_minDistancePredict, _maxDistancePredict, Vector3.Distance(transform.position, _target.transform.position));
 
@@ -59,10 +54,11 @@ public class Projectile : MonoBehaviour
 
         RotateRocket();
     }
+
     private void KeneticWeapons()
     {
         Rigidbody rb = GetComponent<Rigidbody>();
-        rb.velocity = transform.forward * _speed;
+        rb.velocity = _speed * transform.forward;
     }
     public void SetMode(int mode, bool homing = false)
     {
@@ -70,7 +66,7 @@ public class Projectile : MonoBehaviour
         _homing = homing;
     }
 
-    public void InitializeProjectile(float damage, float speed, MechBehavior owningMech,GameObject target = null)
+    public void InitializeProjectile(float damage, float speed, MechBehavior owningMech, GameObject target = null)
     {
         _damage = damage;
         _speed = speed;
@@ -97,7 +93,7 @@ public class Projectile : MonoBehaviour
     {
         var deviation = new Vector3(Mathf.Cos(Time.time * _deviationSpeed), 0, 0);
 
-        var predictionOffset = transform.TransformDirection(deviation) * _deviationAmount * leadTimePercentage;
+        var predictionOffset = _deviationAmount * leadTimePercentage * transform.TransformDirection(deviation);
 
         _deviatedPrediction = _standardPrediction + predictionOffset;
     }
@@ -112,9 +108,19 @@ public class Projectile : MonoBehaviour
         rb.MoveRotation(Quaternion.RotateTowards(transform.rotation, rotation, _projectileRotationSpeed * Time.deltaTime));
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnCollisionEnter(Collision other)
     {
-        _owningMech.HitMech(other.gameObject.GetComponent<MechBehavior>(), _damage);
-        Destroy(this.gameObject);
+        int other_layer = other.gameObject.layer;
+        if (other_layer != gameObject.layer)
+        {
+            if (other.collider.CompareTag("Mech"))    // we hit an enemy mech
+                _owningMech.HitMech(other.gameObject.GetComponent<MechBehavior>(), _damage);
+            else if (other.collider.CompareTag("Projectile")) Destroy(other.gameObject);
+            Destroy(gameObject);
+        }
+        else if (other_layer == LayerMask.NameToLayer("Static"))    // we hit the environment
+        {
+            Destroy(gameObject);
+        }
     }
 }

@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84e4aea864ed50446a2aff409ab67e76, type: 3}
+  m_Name: HomingMissileStat
+  m_EditorClassIdentifier: 
+  weaponType: 1
+  weaponRange: 40
+  weaponDamage: 40
+  weaponSalvoReload: 8
+  weaponSalvoLength: 3
+  weaponShotReload: 1.5
+  ammo: 100
+  homing: 1
+  projectilePrefab: {fileID: 1203426357206433176, guid: bef2140ebe520894097b8daf3ee8b194, type: 3}
+  projectileSpeed: 0
+  projectileRotationSpeed: 260
+  maxDistancePredict: 100
+  minDistancePredict: 5
+  maxTimePrediction: 5

@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -12,15 +11,15 @@ using UnityEngine.AI;
 [RequireComponent(typeof(CombatBehaviour))]
 public class MechBehavior : MonoBehaviour
 {
-    public delegate void MechStateChange(EState @new, EState old, float timeInOld);
+    public delegate void MechStateChange(TState @new, TState old, float timeInOld);
 
     // saved component references
     private NavMeshAgent _navMeshAgent;
     [HideInInspector] public CombatBehaviour combatBehaviour;
-    private Collider _collider;
 
     // children
-    private MeshRenderer selectionPulse;
+    private MeshRenderer _selectionPulse;
+    private MeshRenderer _targetPulse;
     
     // actually class properties
     [SerializeField] private MechType _type;
@@ -28,57 +27,57 @@ public class MechBehavior : MonoBehaviour
     [SerializeField] private Vector3[] _patrol = System.Array.Empty<Vector3>();
     private int _patrolIdx;
 
-    public enum EState
-    {
-        /// <summary>
-        /// Mechs will stand around or, maybe in the future, wander in close proximity
-        /// </summary>
-        Idle = 1,
+    // public enum EState
+    // {
+    //     /// <summary>
+    //     /// Mechs will stand around or, maybe in the future, wander in close proximity
+    //     /// </summary>
+    //     Idle = 1,
 
-        /// <summary>
-        /// For mechs that have a patrol list, will go from point to point
-        /// </summary>
-        Patroling = 2,
+    //     /// <summary>
+    //     /// For mechs that have a patrol list, will go from point to point
+    //     /// </summary>
+    //     Patroling = 2,
 
-        /// <summary>
-        /// When a mech catches aggro of an enemy out of firing range and approaches them
-        /// </summary>
-        Chasing = 4,
+    //     /// <summary>
+    //     /// When a mech catches aggro of an enemy out of firing range and approaches them
+    //     /// </summary>
+    //     Chasing = 4,
 
-        /// <summary>
-        /// When a mech is within range of enemies to attack
-        /// </summary>
-        Fighting = 8,
+    //     /// <summary>
+    //     /// When a mech is within range of enemies to attack
+    //     /// </summary>
+    //     Fighting = 8,
 
-        /// <summary>
-        /// Could be used used if we want mechs to run from aggro if they're in critical condition
-        /// </summary>
-        Retreating = 16, 
+    //     /// <summary>
+    //     /// Could be used used if we want mechs to run from aggro if they're in critical condition
+    //     /// </summary>
+    //     Retreating = 16, 
 
-        /// <summary>
-        /// For player controlled mechs, forces them to follow player waypoints
-        /// </summary>
-        FollowingWaypoint = 32,
+    //     /// <summary>
+    //     /// For player controlled mechs, forces them to follow player waypoints
+    //     /// </summary>
+    //     FollowingWaypoint = 32,
 
-        /// <summary>
-        /// A state the machine will stay in for a few seconds after reaching a player specified waypoint before returning
-        /// to other logic
-        /// </summary>
-        AwaitingWaypoint = 64,
+    //     /// <summary>
+    //     /// A state the machine will stay in for a few seconds after reaching a player specified waypoint before returning
+    //     /// to other logic
+    //     /// </summary>
+    //     AwaitingWaypoint = 64,
 
-        /// <summary>
-        /// They're dead, duh
-        /// </summary>
-        Dead = 128,
-    }
+    //     /// <summary>
+    //     /// They're dead, duh
+    //     /// </summary>
+    //     Dead = 128,
+    // }
 
     /// <summary>
     /// Never set this variable directly, always use SetState()
     /// </summary>
-    private EState _state;
+    private TState _state;
     public MechStateChange stateChange;
     private float _stateDuration;
-    private EState _statePrev; 
+    private TState _statePrev; 
     private int _aggroLayer;
 
     /// <summary>
@@ -88,7 +87,7 @@ public class MechBehavior : MonoBehaviour
     private float _timeTillAggro; 
     private float _timeGainingAggro; 
     private MechBehavior _target;
-    private bool _bTargetSet;
+    private bool _playerSetTarget;
 
     private Weapon[] _weapons;
 
@@ -122,70 +121,70 @@ public class MechBehavior : MonoBehaviour
         _aggroLayer = LayerMask.NameToLayer(! _isPlayer ? "Player" : "Enemy");
         gameObject.layer = LayerMask.NameToLayer(_isPlayer ? "Player" : "Enemy");
         gameObject.tag = "Mech";
-        _weapons = System.Array.Empty<Weapon>();
-        SetState( HasPatrol() ? EState.Patroling : EState.Idle);
-        selectionPulse = transform.GetChild(0).GetComponent<MeshRenderer>();
-        SetIsSelected(false);
-    }
+        _weapons = new Weapon[_type.weapons.Length];
+        for (int i = 0; i < _weapons.Length; ++i)
+        {
+            _weapons[i] = gameObject.AddComponent<Weapon>();
+            _weapons[i].Instantiate(_type.weapons[i], this);
+        }
 
-    void Start()
-    {
+        SetState( HasPatrol() ? TState.Patroling : TState.Idle);
+        _selectionPulse = transform.GetChild(0).GetComponent<MeshRenderer>();
+        SetIsSelected(false);
+        _targetPulse = transform.GetChild(1).GetComponent<MeshRenderer>();
+        SetIsTargeted(false);
         _timeTillAggro = 5f;
-        // Debug.Log($"{name} has the aggro mask \"{LayerMask.LayerToName(_aggroLayer)}\"");
-        // Debug.Log($"{name}'s obj is in mask \"{LayerMask.LayerToName(gameObject.layer)}\"");
     }
 
     void Update()
     {
-        var state = _state;
         _stateDuration += Time.deltaTime;
-        if (state is EState.Dead) return;
+        if (_state == TState.Dead) return;
         
         if (_bGainingAggro && _target == null) _timeGainingAggro += Time.deltaTime;
         else if (!_bGainingAggro && _target == null) _timeGainingAggro -= Time.deltaTime;
 
 
         var tmp_target = FindBestVisibleTarget();
-        // if (tmp_target != null) Debug.Log($"{name} can see enemy mech named {tmp_target.name}");
         var heard_enemy = FindBestHearableTarget();
-        // if (heard_enemy != null) Debug.Log($"{name} can hear enemy mech named {heard_enemy.name}");
         
         if (tmp_target == null)
         {
             if (_timeGainingAggro >= _timeTillAggro) tmp_target = heard_enemy;
             else if (heard_enemy != null) {
-                // Debug.Log($"{name} is gaining Aggro");
                 _bGainingAggro = true;
             }
             else if (_bGainingAggro) {
-                // Debug.Log($"{name} is losing aggro");
                 _bGainingAggro = false;
             }
         }
         
-
-        switch (state)
+        bool is_close_enough;
+        switch (_state.Switch)
         {
-            case EState.Idle:
+            case TState.Idle:
                 if (tmp_target != null) SetTarget(tmp_target);
-                else if (_stateDuration > 5f && HasPatrol()) 
+                else if (HasPatrol()) 
                 {
-                    // goto closest patrol point
                     var dest = _patrol.OrderBy((pos) => (transform.position - pos).sqrMagnitude).First();
                     var patrol_list = _patrol.ToList();
                     _patrolIdx = patrol_list.FindIndex((pos) => pos == dest);
                     SetNavDestination(dest);
-                    SetState(EState.Patroling);
+                    SetState(TState.Patroling);
                 }
                 break;
-            case EState.Patroling:
+            case TState.Patroling:
                 if (tmp_target != null) SetTarget(tmp_target);
                 if (HasReachedDestination()) SetNavDestination(_patrol[++_patrolIdx % _patrol.Length]);
                 break;
-            case EState.Chasing:
-                if (tmp_target != null && !_bTargetSet && tmp_target != _target) SetTarget(tmp_target);
+            case TState.Chasing:
+                if (tmp_target != null && !_playerSetTarget && tmp_target != _target) SetTarget(tmp_target);
                 else if (_target != null) SetNavDestination(_target.transform.position);
-                else if (_target == null && tmp_target == null) SetState(EState.Idle);
+                else if (_target == null && tmp_target == null) 
+                {
+                    SetState(TState.Idle);
+                    break;
+                }
 
                 bool b_close_as_needed = true;
                 if (_weapons.Length == 0) b_close_as_needed = false;
@@ -193,27 +192,79 @@ public class MechBehavior : MonoBehaviour
                 {
                     if (weapon.weaponRange < (_target.transform.position - transform.position).magnitude) 
                     {   
+                        if (tmp_target != null)
+                        {
+                            if (weapon.weaponRange >= (tmp_target.transform.position - transform.position).magnitude)
+                            {
+                                weapon.Fire(tmp_target.gameObject);
+                            }
+                        }
                         b_close_as_needed = false;
-                        // TODO: maybe set weapon states to auto-fire if within range (and then remove the break)
-                        break;
+                    }
+                    else
+                    {
+                        weapon.Fire(_target.gameObject);
                     }
                 }
-                if (b_close_as_needed) SetState(EState.Fighting);
+                if (b_close_as_needed) SetState(TState.Fighting);
                 break;
-            case EState.Fighting:
+            case TState.Fighting:
                 // TODO: some logic for dodging shots or circling enemies or something?
-                if (tmp_target == null && _target == null) SetState(EState.Idle);
+                if (tmp_target == null && _target == null) 
+                {
+                    SetState(TState.Idle);
+                    break;
+                }
+
+                is_close_enough = true;
+                if (_weapons.Length == 0) b_close_as_needed = false;
+                foreach (var weapon in _weapons) 
+                {
+                    if (_target == null) break; // we killed our target
+                    if (weapon.weaponRange < (_target.transform.position - transform.position).magnitude) 
+                    {   
+                        is_close_enough = false;
+                    }
+                    else
+                    {
+                        weapon.Fire(_target.gameObject);
+                    }
+                }
+                if (!is_close_enough) SetState(TState.Chasing);
                 break;
-            case EState.Retreating:
+            case TState.Retreating:
                 // TODO: pathfind to a safe place or retreat to a base?
                 break;
-            case EState.FollowingWaypoint:
-                // TODO: rotate through weapons and fire if there are enemies in range
-                if (HasReachedDestination()) SetState(EState.AwaitingWaypoint);
+            case TState.FollowingWaypoint:
+                if (tmp_target != null && tmp_target._target != null)
+                {
+                    foreach (var weapon in _weapons) 
+                    {
+                        if (weapon.weaponRange >= (tmp_target.transform.position - transform.position).magnitude)
+                        {
+                            weapon.Fire(tmp_target.gameObject);
+                        }
+                    }
+                }
+                if (HasReachedDestination()) 
+                {
+                    if (IsSelected()) SetState(TState.AwaitingWaypoint);
+                    else SetState(TState.Idle);
+                    break;
+                }
                 break;
-            case EState.AwaitingWaypoint:
-                // TODO: rotate through weapons and fire if there are enemies in range
-                // TODO: wait for another waitpoint or for the player to unselect this unit? (Rimworld-like unit drafting)
+            case TState.AwaitingWaypoint:
+                if (tmp_target != null && tmp_target._target != null)
+                {
+                    foreach (var weapon in _weapons) 
+                    {
+                        if (weapon.weaponRange >= (tmp_target.transform.position - transform.position).magnitude)
+                        {
+                            weapon.Fire(tmp_target.gameObject);
+                        }
+                    }
+                }
+                // have some more strict system for directly controlling mechs
                 break;
         }
     }
@@ -242,17 +293,18 @@ public class MechBehavior : MonoBehaviour
 
     private void SetTarget(MechBehavior target)
     {
-        if (_state is EState.Dead) return;
-        if (_state is not EState.Chasing && _state is not EState.Fighting) SetState(EState.Chasing);
-        // Debug.Log($"{name} is targeting {target.name}");
+        if (_state == TState.Dead) return;
+        if (_state != (TState.Chasing | TState.Fighting)) SetState(TState.Chasing);
+        if (IsSelected() && _target != null) _target.SetIsTargeted(false);
         _target = target;
+        if (IsSelected()) _target.SetIsTargeted(true);
         SetNavDestination(_target.transform.position);
     }
 
     /// <summary>
     /// Internal setter for FSM current state
     /// </summary>
-    private void SetState(EState newState)
+    private void SetState(TState newState)
     {
         Debug.Log($"\"{gameObject.name}\" is now \"{newState}\"");
         if (newState == _state) return;
@@ -273,7 +325,7 @@ public class MechBehavior : MonoBehaviour
     /// <summary>
     /// Getter for FSM current state, refer to the public enum MechBehaviour.EState for State descriptions
     /// </summary>
-    public EState GetState() { return _state; }
+    public TState GetState() { return _state; }
 
     /// <summary>
     /// returns the MechType this MechBehaviour is instantiated from (read-only)
@@ -299,7 +351,7 @@ public class MechBehavior : MonoBehaviour
     /// A player command for setting a waypoint
     /// </summary>
     public void CommandSetWaypoint(Vector3 waypoint){
-        SetState(EState.FollowingWaypoint);
+        SetState(TState.FollowingWaypoint);
         SetNavDestination(waypoint);
     }
 
@@ -308,9 +360,9 @@ public class MechBehavior : MonoBehaviour
     /// </summary>
     public void CommandSetTarget(MechBehavior target)
     {
-        if (_state is EState.Dead) return;
+        if (_state == TState.Dead) return;
         SetTarget(target);
-        _bTargetSet = true;
+        _playerSetTarget = true;
     }
 
     /// <summary>
@@ -323,13 +375,18 @@ public class MechBehavior : MonoBehaviour
         var aggro_mechs = new List<MechBehavior>();
         foreach (var collision in collisions)
         {
-            if (collision.gameObject.layer == _aggroLayer) aggro_mechs.Add(collision.GetComponent<MechBehavior>());
+            var obj = collision.gameObject;
+            if (obj.layer == _aggroLayer && obj.CompareTag("Mech")) 
+            {
+                var mech = collision.GetComponent<MechBehavior>();
+                if (mech._state != TState.Dead) aggro_mechs.Add(mech);
+            }
         }
         return aggro_mechs.ToArray();
     }
 
     /// <summary>
-    /// Returns an array of all aggro mechs within MechType.sightRange
+    /// Returns an array of all aggro mechs within MechType.hearingRange
     /// </summary>
     /// <returns></returns>
     public MechBehavior[] FindAllHearableEnemies()
@@ -338,7 +395,12 @@ public class MechBehavior : MonoBehaviour
         var aggro_mechs = new List<MechBehavior>();
         foreach (var collision in collisions)
         {
-            if (collision.gameObject.layer == _aggroLayer) aggro_mechs.Add(collision.GetComponent<MechBehavior>());
+            var obj = collision.gameObject;
+            if (obj.layer == _aggroLayer && obj.CompareTag("Mech")) 
+            {
+                var mech = collision.GetComponent<MechBehavior>();
+                if (mech._state != TState.Dead) aggro_mechs.Add(mech);
+            }
         }
         return aggro_mechs.ToArray();
     }
@@ -351,15 +413,29 @@ public class MechBehavior : MonoBehaviour
     }
 
     /// <summary>
+    /// A delegate for the CombatBehaviour.healthModified event
+    /// Already called internally, you don't need to call it if damage is done through CombatBehaviour
+    /// </summary>
+    public void OnDamaged(TPropertyContainer health, TCombatContext context)
+    {
+        if (context.damage.current <= 0f) return;
+        if (context.instigator == null) return;
+        if (_target == null && _state != (TState.Chasing | TState.Fighting | TState.FollowingWaypoint | TState.AwaitingWaypoint))
+        {
+            SetTarget(context.instigator.GetComponent<MechBehavior>());
+        }
+    }
+
+    /// <summary>
     /// A delegate for the CombatBehaviour.defeatedAgent event
     /// Already called internally, you don't need to call it if damage is done through CombatBehaviour
     /// </summary>
-    public void OnDefeatedAgent(CombatBehaviour behaviour)
+    public void OnDefeatedAgent(CombatBehaviour behaviour, TCombatContext context)
     {
         var mech = behaviour.GetComponent<MechBehavior>();
         if (mech != null && mech == _target)
         {
-            _bTargetSet = false;
+            _playerSetTarget = false;
             _target = null;
         }
     }
@@ -368,10 +444,12 @@ public class MechBehavior : MonoBehaviour
     /// A delegate for the CombatBehaviour.death event
     /// Already called internally, you don't need to call it if damage is done through CombatBehaviour
     /// </summary>
-    public void OnDeath()
+    public void OnDeath(TCombatContext context)
     {
         // TODO: some death animation
-        SetState(EState.Dead);
+        SetState(TState.Dead);
+        SetIsSelected(false);
+        SetIsTargeted(false);
     }
 
     /// <summary>
@@ -382,9 +460,20 @@ public class MechBehavior : MonoBehaviour
         CombatBehaviour.CombatEvent(combatBehaviour, mech.combatBehaviour, TCombatContext.BasicAttack(damage));
     }
 
-    public bool IsSelected() { return selectionPulse.enabled; } 
+    public bool IsSelected() { return _selectionPulse.enabled; } 
     public void SetIsSelected(bool isSelected)
     {
-        selectionPulse.enabled = isSelected;
+        _selectionPulse.enabled = isSelected;
+        if (!isSelected) 
+        {
+            if (_state == TState.AwaitingWaypoint) SetState(TState.Idle);
+            if (_target != null) _target.SetIsTargeted(false);
+        }
+        if (isSelected && _target != null) _target.SetIsTargeted(true);
+    }
+
+    public void SetIsTargeted(bool isTargeted)
+    {
+        _targetPulse.enabled = isTargeted;
     }
 }
