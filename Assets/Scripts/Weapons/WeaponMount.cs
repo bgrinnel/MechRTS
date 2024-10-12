@@ -31,18 +31,24 @@ public class WeaponMount : MonoBehaviour
 
         float rotationStep = _rotationSpeed * Time.deltaTime;
 
-        if (angleDifference > 0)
+        if (angleDifference == 0f)
         {
-            currentAngle += rotationStep;
+            _mountedWeapon.Fire(_target);
         }
-        else if (angleDifference < 0)
-        {
-            currentAngle -= rotationStep;
-        }
-        Debug.Log(currentAngle);
-        currentAngle = Mathf.Clamp(currentAngle, -_leftRotationLimit, _rightRotationLimit);
 
+        else
+        {
+            if (angleDifference > 0)
+            {
+                currentAngle += rotationStep;
+            }
+            else if (angleDifference < 0)
+            {
+                currentAngle -= rotationStep;
+            }
+        }
         
+        currentAngle = Mathf.Clamp(currentAngle, -_leftRotationLimit, _rightRotationLimit);
 
         transform.localRotation = Quaternion.Euler(0, currentAngle, 0);
 
