@@ -22,6 +22,9 @@ public class RTSController : MonoBehaviour
     [SerializeField] private List<GameObject> _playerUnits = new List<GameObject>();
 
     [SerializeField] private List<GameObject> _selectedUnits = new List<GameObject>();
+	
+	[SerializeField] private List<Vector3> _waypointQueue = new List<Vector3>();
+	
     public bool _shiftPressed;
     public bool _holdingCtrl;
     public List<GameObject>[] unitGroups = new List<GameObject>[10];
@@ -95,9 +98,27 @@ public class RTSController : MonoBehaviour
         }
         if (Input.GetMouseButtonUp(1))
         {
-            RightMouseClick();
+			if (_shiftPressed)
+			{
+				//select waypoints for chain movement while shift is down
+				ShiftRightMouseClick();
+			}
+			else
+			{
+				//Release shift after waypoint chain and right click to execute path
+				if (_waypointQueue.Count > 0)
+				{
+					StartCoroutine(ChainMovementCoroutine());
+				}
+				else
+				{
+					//Single waypoint
+					RightMouseClick();
+				}
+			}
         }
     }
+	
     void UpdateSelectionBox(Vector2 start, Vector2 end)
     {
         //Turn on the selectionBox if not yet active
@@ -199,6 +220,33 @@ public class RTSController : MonoBehaviour
         }
         
     }
+	
+	//Same as above except we add each point to a waypoint queue to execute later
+	void ShiftRightMouseClick()
+	{
+		screenPos = Input.mousePosition;
+        Ray ray = Camera.main.ScreenPointToRay(screenPos);
+		if(Physics.Raycast(ray,  out RaycastHit hitData, 1000, backgroundLayerMask)){
+            worldPos = hitData.point;
+			_waypointQueue.Add(worldPos);
+            GameObject splashEffect = Instantiate(moveTargetEffect, worldPos, transform.rotation);
+            Destroy(splashEffect, 0.5f);
+		}
+	}
+	
+	//Use a coroutine to iterate to a waypoint after the previous one has been reached
+	IEnumerator<MechBehavior> ChainMovementCoroutine()
+	{
+    foreach(var unit in _selectedUnits) {
+        MechBehavior mech = unit.GetComponent<MechBehavior>();
+		foreach (var waypoint in _waypointQueue) {
+			mech.CommandSetWaypoint(waypoint);
+			while (!mech.HasReachedDestination()) {yield return null;}
+			}
+		}
+		//Make sure queue is clear after chain movement is done
+		_waypointQueue.Clear();
+	}
 
     
     public void Select(GameObject unit)
