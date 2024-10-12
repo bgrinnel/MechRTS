@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -16,30 +14,78 @@ public class WeaponMount : MonoBehaviour
     private Weapon _mountedWeapon;
 
     public GameObject _target;
-   // public float
-    public void Aim()
+
+    private void Update()
+    {
+        TargetPointing(_target.transform.position);
+    }
+
+    public void TargetPointing(Vector3 targetPosition)
+    {
+        float angleDifference = AngleDifference(targetPosition);
+
+        float currentAngle = transform.localEulerAngles.y;
+
+        if (currentAngle > 180) currentAngle -= 360;
+
+
+        float rotationStep = _rotationSpeed * Time.deltaTime;
+
+        if (angleDifference > 0)
+        {
+            currentAngle += rotationStep;
+        }
+        else if (angleDifference < 0)
+        {
+            currentAngle -= rotationStep;
+        }
+        Debug.Log(currentAngle);
+        currentAngle = Mathf.Clamp(currentAngle, -_leftRotationLimit, _rightRotationLimit);
+
+        
+
+        transform.localRotation = Quaternion.Euler(0, currentAngle, 0);
+
+        
+    }
+
+    public float AngleDifference(Vector3 targetPosition)
+    {
+        Vector3 direction = targetPosition - gameObject.transform.position;
+
+        Vector3 localDirection = gameObject.transform.InverseTransformDirection(direction);
+
+        Vector3 localForward = gameObject.transform.InverseTransformDirection(gameObject.transform.transform.forward);
+
+        float relativeAngle = Vector3.SignedAngle(localForward, localDirection, Vector3.up);
+
+        return relativeAngle;
+    }
+
+    public Vector3 AimPosition(GameObject target)
     {
         Vector3 targetPosition = new Vector3(0,0,0);
         if((_mountedWeapon.weaponType == WeaponScriptable.WeaponType.Missile || _mountedWeapon.weaponType == WeaponScriptable.WeaponType.Kenetic) && !_mountedWeapon.homing)
         {
-            
+            targetPosition = LeadPosition(transform.parent.GetComponent<Rigidbody>(), target.GetComponent<Rigidbody>());
         }
         else
         {
-            targetPosition = _target.transform.position;
+            targetPosition = target.transform.position;
         }
+        return targetPosition;
     }
 
     public void SetTarget(GameObject target)
     {
         _target = target;
     }
-    public WeaponMount(WeaponMountScriptable weaponMountStats, WeaponScriptable scriptable, MechBehavior _mechBehavior)
+    public void InitalizeWeaponMount(WeaponMountScriptable weaponMountStats, WeaponScriptable scriptable, MechBehavior _mechBehavior)
     {
         _leftRotationLimit = weaponMountStats.leftRorationLimit;
         _rightRotationLimit = weaponMountStats.rightRorationLimit;
         _rotationSpeed = weaponMountStats.rorationSpeed;
-        // _mountedWeapon = new Weapon(scriptable, _mechBehavior);
+
     }
 
     private Vector3 LeadPosition(Rigidbody owningMech, Rigidbody targetMech)
@@ -55,7 +101,7 @@ public class WeaponMount : MonoBehaviour
         float distance = displacement.magnitude;
         float relativeSpeed = relativeVelocity.magnitude;
 
-        float timeToImpact = distance / _mountedWeapon.weaponStats.projectileSpeed;
+        float timeToImpact = distance / _mountedWeapon.GetProjectileSpeed();
 
         Vector3 predictionPosition = targetPosition + targetVelocity * timeToImpact;
 
