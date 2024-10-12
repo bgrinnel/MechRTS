@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -89,6 +90,10 @@ public class MechBehavior : MonoBehaviour
     private MechBehavior _target;
     private bool _playerSetTarget;
 
+    public bool IsMoving { get; private set; }
+    public Action stoppedMoving;
+    public Action startedMoving;
+    public Action weaponFired;
     private Weapon[] _weapons;
 
     void Awake()
@@ -186,27 +191,17 @@ public class MechBehavior : MonoBehaviour
                     break;
                 }
 
-                bool b_close_as_needed = true;
-                if (_weapons.Length == 0) b_close_as_needed = false;
+                is_close_enough = true;
+                if (_weapons.Length == 0) is_close_enough = false;
                 foreach (var weapon in _weapons) 
                 {
-                    if (weapon.weaponRange < (_target.transform.position - transform.position).magnitude) 
-                    {   
-                        if (tmp_target != null)
-                        {
-                            if (weapon.weaponRange >= (tmp_target.transform.position - transform.position).magnitude)
-                            {
-                                weapon.Fire(tmp_target.gameObject);
-                            }
-                        }
-                        b_close_as_needed = false;
-                    }
-                    else
+                    if (_target == null) break; // we killed our target
+                    if (!FireAt(weapon, _target))
                     {
-                        weapon.Fire(_target.gameObject);
+                        is_close_enough = false;
                     }
                 }
-                if (b_close_as_needed) SetState(TState.Fighting);
+                if (is_close_enough) SetState(TState.Fighting);
                 break;
             case TState.Fighting:
                 // TODO: some logic for dodging shots or circling enemies or something?
@@ -217,17 +212,13 @@ public class MechBehavior : MonoBehaviour
                 }
 
                 is_close_enough = true;
-                if (_weapons.Length == 0) b_close_as_needed = false;
+                if (_weapons.Length == 0) is_close_enough = false;
                 foreach (var weapon in _weapons) 
                 {
                     if (_target == null) break; // we killed our target
-                    if (weapon.weaponRange < (_target.transform.position - transform.position).magnitude) 
-                    {   
-                        is_close_enough = false;
-                    }
-                    else
+                    if (!FireAt(weapon, _target))
                     {
-                        weapon.Fire(_target.gameObject);
+                        is_close_enough = false;
                     }
                 }
                 if (!is_close_enough) SetState(TState.Chasing);
@@ -240,10 +231,8 @@ public class MechBehavior : MonoBehaviour
                 {
                     foreach (var weapon in _weapons) 
                     {
-                        if (weapon.weaponRange >= (tmp_target.transform.position - transform.position).magnitude)
-                        {
-                            weapon.Fire(tmp_target.gameObject);
-                        }
+                        if (tmp_target.GetState() == TState.Dead) break;
+                        FireAt(weapon, tmp_target);
                     }
                 }
                 if (HasReachedDestination()) 
@@ -258,14 +247,20 @@ public class MechBehavior : MonoBehaviour
                 {
                     foreach (var weapon in _weapons) 
                     {
-                        if (weapon.weaponRange >= (tmp_target.transform.position - transform.position).magnitude)
-                        {
-                            weapon.Fire(tmp_target.gameObject);
-                        }
+                        if (tmp_target.GetState() == TState.Dead) break;
+                        FireAt(weapon, tmp_target);
                     }
                 }
                 // have some more strict system for directly controlling mechs
                 break;
+        }
+
+        bool is_moving = _navMeshAgent.velocity.sqrMagnitude > 0f; 
+        if (is_moving != IsMoving)
+        {
+            if (is_moving) startedMoving?.Invoke();
+            else stoppedMoving?.Invoke();
+            IsMoving = is_moving;
         }
     }
 
@@ -320,6 +315,20 @@ public class MechBehavior : MonoBehaviour
     private void SetNavDestination(Vector3 newDest)
     {
         _navMeshAgent.destination = newDest;
+    }
+
+    /// <summary>
+    /// Attempts to fire at the given target, returns true if the shot was executed, false otherwise
+    /// </summary>
+    private bool FireAt(Weapon weapon, MechBehavior target)
+    {
+        if (weapon.weaponRange < (target.transform.position - transform.position).magnitude) 
+        {   
+            return false;
+        }
+        weapon.Fire(target.gameObject);
+        weaponFired?.Invoke();
+        return true;
     }
 
     /// <summary>

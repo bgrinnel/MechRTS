@@ -183,6 +183,7 @@ GameObject:
   - component: {fileID: 6615543447017821524}
   - component: {fileID: 5291303062333256201}
   - component: {fileID: 7435224765226779523}
+  - component: {fileID: 1605912529760823001}
   m_Layer: 13
   m_Name: MechPrefab
   m_TagString: Mech
@@ -374,3 +375,31 @@ MonoBehaviour:
   mech: {fileID: 7937762160031891975}
   navAgent: {fileID: 0}
   navPath: []
+--- !u!114 &1605912529760823001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5945213448265704409}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b333b98a9197424e9eace1b895b8ce4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mechstepsSFX:
+    audioClips:
+    - {fileID: 8300000, guid: 0370d89610df10f45a4679604ac5a11f, type: 3}
+    - {fileID: 8300000, guid: 34f7f488fb5007444bf7ab2c718ede19, type: 3}
+    deviationVolume: 0.25
+    deviationPitch: 0.125
+  weaponFireSFX:
+    audioClips: []
+    deviationVolume: 0.085
+    deviationPitch: 0.0652
+  endMechstepsSFX:
+    audioClips: []
+    deviationVolume: 0.142
+    deviationPitch: 0.0727
+  sfxMixerGroup: {fileID: -5006061491257433036, guid: cdfa2d0d698e8374f8bf07c586cccac3, type: 2}
+  _secondsBetweenFootfalls: 0.8
