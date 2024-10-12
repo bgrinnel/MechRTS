@@ -17,7 +17,11 @@ public class WeaponMount : MonoBehaviour
 
     private void Update()
     {
-        TargetPointing(_target.transform.position);
+        if (_target != null)
+        {
+            var targetPosition = AimPosition(_target);
+            TargetPointing(targetPosition);
+        }
     }
 
     public void TargetPointing(Vector3 targetPosition)
