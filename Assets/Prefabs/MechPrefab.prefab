@@ -303,6 +303,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57b33971a1a815f489dde928e3698c48, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _smoke: {fileID: 0}
   combatBehaviour: {fileID: 0}
   _type: {fileID: 11400000, guid: eccfdc06a2d52514d920c792656dc335, type: 2}
   _isPlayer: 0

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: RifleStat
   m_EditorClassIdentifier: 
   weaponType: 0
-  weaponRange: 20
+  weaponRange: 50
   weaponDamage: 75
   weaponSalvoReload: 0.8
   weaponSalvoLength: 3

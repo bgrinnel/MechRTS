@@ -11,6 +11,7 @@ using UnityEngine.AI;
 [RequireComponent(typeof(CombatBehaviour))]
 public class MechBehavior : MonoBehaviour
 {
+    [SerializeField] private ParticleSystem _smoke;
     public delegate void MechStateChange(TState @new, TState old, float timeInOld);
 
     // saved component references
@@ -26,6 +27,7 @@ public class MechBehavior : MonoBehaviour
     [SerializeField] private bool _isPlayer;
     [SerializeField] private Vector3[] _patrol = System.Array.Empty<Vector3>();
     private int _patrolIdx;
+    
 
     // public enum EState
     // {
@@ -93,6 +95,8 @@ public class MechBehavior : MonoBehaviour
 
     void Awake()
     {
+        _smoke = GetComponentInChildren<ParticleSystem>();
+
         _navMeshAgent = GetComponent<NavMeshAgent>();
         _navMeshAgent.speed = _type.agentType.speed;
         _navMeshAgent.angularSpeed = _type.agentType.angularSpeed;
@@ -448,6 +452,7 @@ public class MechBehavior : MonoBehaviour
     {
         // TODO: some death animation
         SetState(TState.Dead);
+        _smoke.Play(true);
         SetIsSelected(false);
         SetIsTargeted(false);
     }
