@@ -8,7 +8,7 @@ public class Projectile : MonoBehaviour
     private float _damage, _speed, _maxDistancePredict, _minDistancePredict, _maxTimePrediction, _projectileRotationSpeed;
     private Vector3 _standardPrediction, _deviatedPrediction;
     private MechBehavior _owningMech;
-    [SerializeField] private float _deviationAmount = 50;
+    [SerializeField] private float _deviationAmount = 5;
     [SerializeField] private float _deviationSpeed = 2;
 
     private void FixedUpdate()

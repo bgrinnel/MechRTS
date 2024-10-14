@@ -1,4 +1,10 @@
 using System;
+<<<<<<< HEAD
+=======
+using UnityEngine;
+using TMPro;
+using UnityEditor;
+>>>>>>> v1.1test
 
 /// Note from Jeff:
 /// This is a work-in-progress, only making necessary elements of this right now.

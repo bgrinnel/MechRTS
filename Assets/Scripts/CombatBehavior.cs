@@ -7,6 +7,7 @@ using UnityEngine;
 /// </summary>
 public class CombatBehaviour : MonoBehaviour
 {
+    
     public delegate void Message(TCombatContext context);
 
     public delegate void AgentMessage(CombatBehaviour agent, TCombatContext context);
