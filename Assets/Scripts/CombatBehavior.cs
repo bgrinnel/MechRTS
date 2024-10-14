@@ -7,6 +7,7 @@ using UnityEngine;
 /// </summary>
 public class CombatBehaviour : MonoBehaviour
 {
+    
     public delegate void Message(TCombatContext context);
 
     public delegate void AgentMessage(CombatBehaviour agent, TCombatContext context);
@@ -19,11 +20,8 @@ public class CombatBehaviour : MonoBehaviour
     public delegate void PropertyChange(in TPropertyContainer container, TCombatContext context);
 
     /// <summary>
-    /// The combat function, handles al
+    /// The combat function, handles all combat events (eg anything where damage is (attempted to be) done)
     /// </summary>
-    /// <param name="instigator"></param>
-    /// <param name="target"></param>
-    /// <param name="context"></param>
    public static void CombatEvent(CombatBehaviour instigator, CombatBehaviour target, TCombatContext context)
    {
         if (target == null) return;

@@ -154,7 +154,7 @@ public class MechBehaviourEditor : Editor
             _serializedAgent_autoBraking.boolValue = mech_type.agentType.autoBraking;
             _serializedAgent_radius.floatValue = mech_type.agentType.radius;
             _serializedAgent_height.floatValue = mech_type.agentType.height;
-            _serializedAgent_baseOffset.floatValue = mech_type.agentType.height / 2.2f;
+            _serializedAgent_baseOffset.floatValue = mech_type.agentType.height / 1.95f;
             _serializedAgent_autoTraverseOffMeshLink.boolValue = true;
             _serializedAgent_agentTypeID.intValue = -1372625422;                // I initially printed the mech id to find its value
             // Debug.Log($"NavMeshAgent typeId = {nav_type_id}");

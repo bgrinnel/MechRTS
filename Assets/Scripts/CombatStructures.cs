@@ -1,7 +1,8 @@
 
 using System;
-using TMPro.EditorUtilities;
-using UnityEditor.Build;
+using UnityEngine;
+using TMPro;
+using UnityEditor;
 
 /// Note from Jeff:
 /// This is a work-in-progress, only making necessary elements of this right now.

@@ -60,16 +60,15 @@ public class MechVisualDebugger : MonoBehaviour
         {
             navPath = navAgent.path.corners.ToList();
         }
+
         _stateText.text = mech.GetState().ToString();
     }    
 
     void LateUpdate()
     {
         _stateBanner.transform.position = mech.transform.position + new Vector3(0f, 3f, 0f);
-        // _stateBanner.transform.LookAt(_mainCamera.transform.position);
         _stateBanner.transform.LookAt(_stateBanner.transform.position + _mainCamera.transform.rotation * Vector3.forward,
                              _mainCamera.transform.rotation * Vector3.up);
-        // _stateBanner.transform.Rotate(_stateBanner.transform.up, 180f);
     }
 
     void OnDrawGizmosSelected()

@@ -153,4 +153,9 @@ public class Weapon : MonoBehaviour
         _isReloading = false;
         _salvoIdx = 0;
     }
+
+    public float GetProjectileSpeed()
+    {
+        return weaponStats.projectileSpeed;
+    }
 }

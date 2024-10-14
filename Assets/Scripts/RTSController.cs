@@ -82,7 +82,7 @@ public class RTSController : MonoBehaviour
         }
         
         //right mouse click
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButtonDown(1) && _selectedUnits.Count > 0)
         {
             screenPos = Input.mousePosition;
             Ray ray = Camera.main.ScreenPointToRay(screenPos);
@@ -92,12 +92,10 @@ public class RTSController : MonoBehaviour
                     unit.GetComponent<MechBehavior>().CommandSetTarget(mech);
                 }
             }
-        }
-        if (Input.GetMouseButtonUp(1))
-        {
-            RightMouseClick();
+            else RightMouseClick();
         }
     }
+
     void UpdateSelectionBox(Vector2 start, Vector2 end)
     {
         //Turn on the selectionBox if not yet active
