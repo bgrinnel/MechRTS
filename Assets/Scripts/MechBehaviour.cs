@@ -463,11 +463,7 @@ public class MechBehavior : MonoBehaviour
     {
         // TODO: some death animation
         SetState(TState.Dead);
-<<<<<<< HEAD
-        
-=======
         _smoke.Play(true);
->>>>>>> v1.1test
         SetIsSelected(false);
         SetIsTargeted(false);
     }
