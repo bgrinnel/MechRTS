@@ -1,3 +1,9 @@
+
+using System;
+using UnityEngine;
+using TMPro;
+using UnityEditor;
+
 /// Note from Jeff:
 /// This is a work-in-progress, only making necessary elements of this right now.
 /// hoping it will allow us a lot of flexibilty in the future (also, I can steal this code of mine for elsewhere) <summary>
