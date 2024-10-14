@@ -14,17 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 700
   agentType:
-    speed: 35
-    angularSpeed: 480
-    acceleration: 150
-    stoppingDistance: 3
+    speed: 8
+    angularSpeed: 120
+    acceleration: 10
+    stoppingDistance: 1
     autoBraking: 1
     radius: 0.5
     height: 2
-  mass: 1500
-  drag: 5
-  angularDrag: 10
-  sightRange: 20
-  hearingRange: 100
+  mass: 300
+  drag: 10
+  angularDrag: 20
+  sightRange: 30
+  hearingRange: 55
   weapons:
   - {fileID: 11400000, guid: 89301543cf92d17468ed9432e459ce01, type: 2}

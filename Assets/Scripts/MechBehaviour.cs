@@ -380,12 +380,11 @@ public class MechBehavior : MonoBehaviour
     /// <returns></returns>
     public MechBehavior[] FindAllVisibleEnemies()
     {
-        var collisions = Physics.OverlapSphere(transform.position, _type.sightRange);
+        var collisions = Physics.OverlapSphere(transform.position, _type.sightRange, _aggroLayer);
         var aggro_mechs = new List<MechBehavior>();
         foreach (var collision in collisions)
         {
-            var obj = collision.gameObject;
-            if (obj.layer == _aggroLayer && obj.CompareTag("Mech")) 
+            if (collision.gameObject.CompareTag("Mech")) 
             {
                 var mech = collision.GetComponent<MechBehavior>();
                 if (mech._state != TState.Dead) aggro_mechs.Add(mech);
@@ -400,12 +399,11 @@ public class MechBehavior : MonoBehaviour
     /// <returns></returns>
     public MechBehavior[] FindAllHearableEnemies()
     {
-        var collisions = Physics.OverlapSphere(transform.position, _type.hearingRange);
+        var collisions = Physics.OverlapSphere(transform.position, _type.hearingRange, _aggroLayer);
         var aggro_mechs = new List<MechBehavior>();
         foreach (var collision in collisions)
         {
-            var obj = collision.gameObject;
-            if (obj.layer == _aggroLayer && obj.CompareTag("Mech")) 
+            if (collision.gameObject.CompareTag("Mech")) 
             {
                 var mech = collision.GetComponent<MechBehavior>();
                 if (mech._state != TState.Dead) aggro_mechs.Add(mech);
