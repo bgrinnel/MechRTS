@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 700
   agentType:
-    speed: 8
+    speed: 16
     angularSpeed: 120
-    acceleration: 10
-    stoppingDistance: 1
+    acceleration: 20
+    stoppingDistance: 2
     autoBraking: 1
     radius: 0.5
     height: 2

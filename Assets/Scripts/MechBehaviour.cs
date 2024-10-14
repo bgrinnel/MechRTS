@@ -79,7 +79,7 @@ public class MechBehavior : MonoBehaviour
     public MechStateChange stateChange;
     private float _stateDuration;
     private TState _statePrev; 
-    private int _aggroLayer;
+    private int _aggroMask;
 
     /// <summary>
     /// Define public getters and delegates for handling aggro events
@@ -106,7 +106,7 @@ public class MechBehavior : MonoBehaviour
         _navMeshAgent.autoBraking = _type.agentType.autoBraking;
         _navMeshAgent.radius = _type.agentType.radius;
         _navMeshAgent.height = _type.agentType.height;
-        _navMeshAgent.height = _type.agentType.height / 2.2f;
+        _navMeshAgent.height = _type.agentType.height / 1.95f;
         _navMeshAgent.autoTraverseOffMeshLink = true;
         _navMeshAgent.agentTypeID = -1372625422;                // I initially printed the mech id to find its value
 
@@ -123,7 +123,7 @@ public class MechBehavior : MonoBehaviour
         combatBehaviour.Initialize(_type.maxHealth);
         combatBehaviour.defeatedAgent += OnDefeatedAgent;
         combatBehaviour.death += OnDeath;
-        _aggroLayer = LayerMask.NameToLayer(! _isPlayer ? "Player" : "Enemy");
+        _aggroMask = LayerMask.GetMask(!_isPlayer ? "Player" : "Enemy");
         gameObject.layer = LayerMask.NameToLayer(_isPlayer ? "Player" : "Enemy");
         gameObject.tag = "Mech";
         _weapons = new Weapon[_type.weapons.Length];
@@ -139,6 +139,10 @@ public class MechBehavior : MonoBehaviour
         _targetPulse = transform.GetChild(1).GetComponent<MeshRenderer>();
         SetIsTargeted(false);
         _timeTillAggro = 5f;
+        Debug.Log($"'Player' GetMask() = {LayerMask.GetMask("Player")} NameToLayer() = {LayerMask.NameToLayer("Player")}");
+        Debug.Log($"'Enemy' GetMask() = {LayerMask.GetMask("Enemy")} NameToLayer() = {LayerMask.NameToLayer("Enemy")}");
+        Debug.Log($"'{name}'.layer = {gameObject.layer} | LayerToName() = {LayerMask.LayerToName(gameObject.layer)}");
+        // Debug.Log($"Mech '{name}' is on layer {LayerMask.LayerToName(gameObject.layer)}, and has aggro '{LayerMask.LayerToName(_aggroLayer)}'");
     }
 
     void Update()
@@ -380,7 +384,7 @@ public class MechBehavior : MonoBehaviour
     /// <returns></returns>
     public MechBehavior[] FindAllVisibleEnemies()
     {
-        var collisions = Physics.OverlapSphere(transform.position, _type.sightRange, _aggroLayer);
+        var collisions = Physics.OverlapSphere(transform.position, _type.sightRange, _aggroMask);
         var aggro_mechs = new List<MechBehavior>();
         foreach (var collision in collisions)
         {
@@ -399,7 +403,7 @@ public class MechBehavior : MonoBehaviour
     /// <returns></returns>
     public MechBehavior[] FindAllHearableEnemies()
     {
-        var collisions = Physics.OverlapSphere(transform.position, _type.hearingRange, _aggroLayer);
+        var collisions = Physics.OverlapSphere(transform.position, _type.hearingRange, _aggroMask);
         var aggro_mechs = new List<MechBehavior>();
         foreach (var collision in collisions)
         {
@@ -455,6 +459,7 @@ public class MechBehavior : MonoBehaviour
     {
         // TODO: some death animation
         SetState(TState.Dead);
+        
         SetIsSelected(false);
         SetIsTargeted(false);
     }
@@ -470,13 +475,17 @@ public class MechBehavior : MonoBehaviour
     public bool IsSelected() { return _selectionPulse.enabled; } 
     public void SetIsSelected(bool isSelected)
     {
+        Debug.Log($"Setting is Selected {isSelected}");
         _selectionPulse.enabled = isSelected;
+        if (_target != null) _target.SetIsTargeted(isSelected);
         if (!isSelected) 
         {
             if (_state == TState.AwaitingWaypoint) SetState(TState.Idle);
-            if (_target != null) _target.SetIsTargeted(false);
         }
-        if (isSelected && _target != null) _target.SetIsTargeted(true);
+        if (isSelected) 
+        {
+            if (_state == TState.Idle) SetState(TState.AwaitingWaypoint);
+        }
     }
 
     public void SetIsTargeted(bool isTargeted)

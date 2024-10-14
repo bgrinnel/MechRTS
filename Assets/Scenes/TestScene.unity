@@ -381,15 +381,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1352040504521864624, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_Drag
-      value: 5
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 1352040504521864624, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_Mass
-      value: 1500
+      value: 300
       objectReference: {fileID: 0}
     - target: {fileID: 1352040504521864624, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_AngularDrag
-      value: 10
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 1352040504521864624, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_Interpolate
@@ -405,19 +405,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3867819575959378026, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_Speed
-      value: 35
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 3867819575959378026, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_AutoBraking
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3867819575959378026, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_Acceleration
-      value: 150
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 3867819575959378026, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_AngularSpeed
-      value: 480
+      value: 120
+      objectReference: {fileID: 0}
+    - target: {fileID: 3867819575959378026, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
+      propertyPath: m_StoppingDistance
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4141440727896056310, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_LocalPosition.x
@@ -465,7 +469,7 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 64d54d0f4fbaea84fa2360ac7f9d5c55, type: 2}
     - target: {fileID: 5945213448265704409, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_Name
-      value: MechPrefab (1)
+      value: EnemyMech2
       objectReference: {fileID: 0}
     - target: {fileID: 7284709147818942656, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: _isPlayer
@@ -474,7 +478,7 @@ PrefabInstance:
     - target: {fileID: 7937762160031891975, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: _type
       value: 
-      objectReference: {fileID: 11400000, guid: acdb593d64e51fb41b0b6db7a81ff88f, type: 2}
+      objectReference: {fileID: 11400000, guid: eccfdc06a2d52514d920c792656dc335, type: 2}
     - target: {fileID: 7937762160031891975, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: _patrol.Array.size
       value: 4
@@ -562,15 +566,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1352040504521864624, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_Drag
-      value: 5
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 1352040504521864624, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_Mass
-      value: 1500
+      value: 300
       objectReference: {fileID: 0}
     - target: {fileID: 1352040504521864624, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_AngularDrag
-      value: 10
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 1352040504521864624, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_Interpolate
@@ -586,19 +590,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3867819575959378026, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_Speed
-      value: 35
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 3867819575959378026, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_AutoBraking
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3867819575959378026, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_Acceleration
-      value: 150
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 3867819575959378026, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_AngularSpeed
-      value: 480
+      value: 120
+      objectReference: {fileID: 0}
+    - target: {fileID: 3867819575959378026, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
+      propertyPath: m_StoppingDistance
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4141440727896056310, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_LocalPosition.x
@@ -644,6 +652,10 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 64d54d0f4fbaea84fa2360ac7f9d5c55, type: 2}
+    - target: {fileID: 5945213448265704409, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
+      propertyPath: m_Name
+      value: EnemyMech1
+      objectReference: {fileID: 0}
     - target: {fileID: 7284709147818942656, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: _isPlayer
       value: 1
@@ -651,7 +663,7 @@ PrefabInstance:
     - target: {fileID: 7937762160031891975, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: _type
       value: 
-      objectReference: {fileID: 11400000, guid: acdb593d64e51fb41b0b6db7a81ff88f, type: 2}
+      objectReference: {fileID: 11400000, guid: eccfdc06a2d52514d920c792656dc335, type: 2}
     - target: {fileID: 7937762160031891975, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: _patrol.Array.size
       value: 4
@@ -744,15 +756,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1352040504521864624, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_Drag
-      value: 5
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 1352040504521864624, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_Mass
-      value: 1500
+      value: 300
       objectReference: {fileID: 0}
     - target: {fileID: 1352040504521864624, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_AngularDrag
-      value: 10
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 1352040504521864624, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_Interpolate
@@ -768,19 +780,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3867819575959378026, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_Speed
-      value: 35
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 3867819575959378026, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_AutoBraking
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3867819575959378026, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_Acceleration
-      value: 150
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 3867819575959378026, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_AngularSpeed
-      value: 480
+      value: 120
+      objectReference: {fileID: 0}
+    - target: {fileID: 3867819575959378026, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
+      propertyPath: m_StoppingDistance
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4141440727896056310, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_LocalPosition.x
@@ -832,7 +848,7 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 64d54d0f4fbaea84fa2360ac7f9d5c55, type: 2}
     - target: {fileID: 5945213448265704409, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_Name
-      value: MechPrefab (2)
+      value: PlayerMech1
       objectReference: {fileID: 0}
     - target: {fileID: 5945213448265704409, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_Layer
@@ -1057,7 +1073,7 @@ MonoBehaviour:
     m_Bits: 16384
   backgroundLayerMask:
     serializedVersion: 2
-    m_Bits: 65
+    m_Bits: 64
   enemyLayerMask:
     serializedVersion: 2
     m_Bits: 8192
@@ -1257,15 +1273,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1352040504521864624, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_Drag
-      value: 5
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 1352040504521864624, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_Mass
-      value: 1500
+      value: 300
       objectReference: {fileID: 0}
     - target: {fileID: 1352040504521864624, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_AngularDrag
-      value: 10
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 1352040504521864624, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_Interpolate
@@ -1281,19 +1297,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3867819575959378026, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_Speed
-      value: 35
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 3867819575959378026, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_AutoBraking
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3867819575959378026, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_Acceleration
-      value: 150
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 3867819575959378026, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_AngularSpeed
-      value: 480
+      value: 120
+      objectReference: {fileID: 0}
+    - target: {fileID: 3867819575959378026, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
+      propertyPath: m_StoppingDistance
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4141440727896056310, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1345,7 +1365,7 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 64d54d0f4fbaea84fa2360ac7f9d5c55, type: 2}
     - target: {fileID: 5945213448265704409, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_Name
-      value: MechPrefab (3)
+      value: PlayerMech2
       objectReference: {fileID: 0}
     - target: {fileID: 5945213448265704409, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_Layer
