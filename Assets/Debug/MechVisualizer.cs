@@ -66,7 +66,7 @@ public class MechVisualDebugger : MonoBehaviour
 
     void LateUpdate()
     {
-        _stateBanner.transform.position = mech.transform.position + new Vector3(0f, 3f, 0f);
+        _stateBanner.transform.position = mech.transform.position + new Vector3(0f, 4f, 0f);
         _stateBanner.transform.LookAt(_stateBanner.transform.position + _mainCamera.transform.rotation * Vector3.forward,
                              _mainCamera.transform.rotation * Vector3.up);
     }

@@ -28,51 +28,6 @@ public class MechBehavior : MonoBehaviour
     [SerializeField] private bool _isPlayer;
     [SerializeField] private Vector3[] _patrol = System.Array.Empty<Vector3>();
     private int _patrolIdx;
-    
-
-    // public enum EState
-    // {
-    //     /// <summary>
-    //     /// Mechs will stand around or, maybe in the future, wander in close proximity
-    //     /// </summary>
-    //     Idle = 1,
-
-    //     /// <summary>
-    //     /// For mechs that have a patrol list, will go from point to point
-    //     /// </summary>
-    //     Patroling = 2,
-
-    //     /// <summary>
-    //     /// When a mech catches aggro of an enemy out of firing range and approaches them
-    //     /// </summary>
-    //     Chasing = 4,
-
-    //     /// <summary>
-    //     /// When a mech is within range of enemies to attack
-    //     /// </summary>
-    //     Fighting = 8,
-
-    //     /// <summary>
-    //     /// Could be used used if we want mechs to run from aggro if they're in critical condition
-    //     /// </summary>
-    //     Retreating = 16, 
-
-    //     /// <summary>
-    //     /// For player controlled mechs, forces them to follow player waypoints
-    //     /// </summary>
-    //     FollowingWaypoint = 32,
-
-    //     /// <summary>
-    //     /// A state the machine will stay in for a few seconds after reaching a player specified waypoint before returning
-    //     /// to other logic
-    //     /// </summary>
-    //     AwaitingWaypoint = 64,
-
-    //     /// <summary>
-    //     /// They're dead, duh
-    //     /// </summary>
-    //     Dead = 128,
-    // }
 
     /// <summary>
     /// Never set this variable directly, always use SetState()
@@ -83,9 +38,8 @@ public class MechBehavior : MonoBehaviour
     private TState _statePrev; 
     private int _aggroMask;
 
-    /// <summary>
-    /// Define public getters and delegates for handling aggro events
-    /// </summary>
+
+    // Define public getters and delegates for handling aggro events
     private bool _bGainingAggro;
     private float _timeTillAggro; 
     private float _timeGainingAggro; 
@@ -115,7 +69,6 @@ public class MechBehavior : MonoBehaviour
         _navMeshAgent.agentTypeID = -1372625422;                // I initially printed the mech id to find its value
 
         var collider = GetComponent<CapsuleCollider>();
-        // Debug.Log($"NavMeshAgent typeId = {nav_type_id}");
         collider.radius = _type.agentType.radius;
         collider.height = _type.agentType.height;
         var rigidbody = GetComponent<Rigidbody>();
@@ -143,10 +96,9 @@ public class MechBehavior : MonoBehaviour
         _targetPulse = transform.GetChild(1).GetComponent<MeshRenderer>();
         SetIsTargeted(false);
         _timeTillAggro = 5f;
-        Debug.Log($"'Player' GetMask() = {LayerMask.GetMask("Player")} NameToLayer() = {LayerMask.NameToLayer("Player")}");
-        Debug.Log($"'Enemy' GetMask() = {LayerMask.GetMask("Enemy")} NameToLayer() = {LayerMask.NameToLayer("Enemy")}");
-        Debug.Log($"'{name}'.layer = {gameObject.layer} | LayerToName() = {LayerMask.LayerToName(gameObject.layer)}");
-        // Debug.Log($"Mech '{name}' is on layer {LayerMask.LayerToName(gameObject.layer)}, and has aggro '{LayerMask.LayerToName(_aggroLayer)}'");
+        // Debug.Log($"'Player' GetMask() = {LayerMask.GetMask("Player")} NameToLayer() = {LayerMask.NameToLayer("Player")}");
+        // Debug.Log($"'Enemy' GetMask() = {LayerMask.GetMask("Enemy")} NameToLayer() = {LayerMask.NameToLayer("Enemy")}");
+        // Debug.Log($"'{name}'.layer = {gameObject.layer} | LayerToName() = {LayerMask.LayerToName(gameObject.layer)}");
     }
 
     void Update()
@@ -302,6 +254,13 @@ public class MechBehavior : MonoBehaviour
         _target = target;
         if (IsSelected()) _target.SetIsTargeted(true);
         SetNavDestination(_target.transform.position);
+        _target.GetComponent<CombatBehaviour>().death += OnTargetDeath;
+    }
+
+    public void OnTargetDeath(TCombatContext context)
+    {
+        _target = null;
+        _playerSetTarget = false;
     }
 
     /// <summary>
@@ -334,8 +293,7 @@ public class MechBehavior : MonoBehaviour
         {   
             return false;
         }
-        weapon.Fire(target.gameObject);
-        weaponFired?.Invoke();
+        if (weapon.Fire(target.gameObject)) weaponFired?.Invoke();
         return true;
     }
 

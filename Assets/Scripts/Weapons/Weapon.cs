@@ -69,10 +69,10 @@ public class Weapon : MonoBehaviour
     private int _salvoIdx;
     private Coroutine _reloadTimer;
 
-    public void Fire(GameObject target)
+    public bool Fire(GameObject target)
     {
         // Debug.Log($"{weaponStats.name} firing");
-        if (_isReloading) return;
+        if (_isReloading) return false;
         switch (weaponType)
         {
             case WeaponScriptable.WeaponType.DirectEffect:
@@ -95,6 +95,7 @@ public class Weapon : MonoBehaviour
             _salvoIdx = 0;
             _reloadTimer = StartCoroutine(PauseWeaponFor(SalvoReloadSec));
         }
+        return true;
     }
 
     private IEnumerator PauseWeaponFor(float time)

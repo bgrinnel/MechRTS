@@ -201,7 +201,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 3, y: 3, z: 3}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 5985328754071910306}
@@ -395,12 +395,15 @@ MonoBehaviour:
     deviationVolume: 0.25
     deviationPitch: 0.125
   weaponFireSFX:
-    audioClips: []
-    deviationVolume: 0.085
-    deviationPitch: 0.0652
+    audioClips:
+    - {fileID: 8300000, guid: 37432cd592eb55d429b7a4267cf3ad38, type: 3}
+    - {fileID: 8300000, guid: 5048ad4310d44694d8179aba444f8cef, type: 3}
+    - {fileID: 8300000, guid: 425786a01365f87488a268ffcd924254, type: 3}
+    deviationVolume: 0.25
+    deviationPitch: 0.125
   endMechstepsSFX:
     audioClips: []
     deviationVolume: 0.142
     deviationPitch: 0.0727
   sfxMixerGroup: {fileID: -5006061491257433036, guid: cdfa2d0d698e8374f8bf07c586cccac3, type: 2}
-  _secondsBetweenFootfalls: 0.8
+  _secondsBetweenFootfalls: 1.2
