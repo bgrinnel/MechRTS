@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UIElements;
 
 // TODO: To: Jeff, From: Jeff - See if Unity's State Machines would be a better place for this FSM logic
 /// <summary>
@@ -52,6 +54,51 @@ public class MechBehavior : MonoBehaviour
     public Action weaponFired;
     private Weapon[] _weapons;
 
+    /// <summary>
+    /// the distance egagement starts (i.e. max(all_weapon_ranges))
+    /// </summary>
+    private float enageDistanceStart;
+
+    /// <summary>
+    /// the distance egagement is full (i.e. min(all_weapon_ranges))
+    /// </summary>
+    private float engageDistanceFull;
+
+    /// <summary>
+    /// the distance a mech will move back to create space (i.e. engageDistanceFull * 0.5f)
+    /// </summary>
+    private float engageDistanceRetreat;
+    
+    /// <summary>
+    /// A string that used for visiual debugging, desrives the current manuever of this mech
+    /// </summary>
+    public string EvasionManuveur { get; private set; }
+
+    private float scaledRadius;
+
+    /// <summary>
+    /// Defines several states that a target can be from this mech
+    /// </summary>
+    private enum EEngagment 
+    {
+        /// <summary>
+        /// The target is farther away than MechBehaviour.engageDistanceStart
+        /// </summary>
+        OutOfRange,
+        /// <summary>
+        /// The target is farther away than MechBehaviour.engageDistanceFull
+        /// </summary>
+        InRangePartial,
+        /// <summary>
+        /// The target is closer than MechBehaviour.engageDistanceFull
+        /// </summary>
+        InRangeFull,
+        /// <summary>
+        /// The target is closer than MechBehaviour.engageDistanceRetreat
+        /// </summary>
+        TooClose
+    }
+
     void Awake()
     {
         _smoke = GetComponentInChildren<ParticleSystem>();
@@ -83,19 +130,27 @@ public class MechBehavior : MonoBehaviour
         _aggroMask = LayerMask.GetMask(!_isPlayer ? "Player" : "Enemy");
         gameObject.layer = LayerMask.NameToLayer(_isPlayer ? "Player" : "Enemy");
         gameObject.tag = "Mech";
+
         _weapons = new Weapon[_type.weapons.Length];
+        enageDistanceStart = 0;
+        engageDistanceFull = float.PositiveInfinity;
         for (int i = 0; i < _weapons.Length; ++i)
         {
             _weapons[i] = gameObject.AddComponent<Weapon>();
             _weapons[i].Instantiate(_type.weapons[i], this);
+            float weapon_range = _weapons[i].weaponRange;
+            if (weapon_range > enageDistanceStart) enageDistanceStart = weapon_range;
+            if (weapon_range < engageDistanceFull) engageDistanceFull =  weapon_range;
         }
-
+        engageDistanceRetreat = engageDistanceFull / 2f;
+        EvasionManuveur = "";
         SetState( HasPatrol() ? TState.Patroling : TState.Idle);
         _selectionPulse = transform.GetChild(0).GetComponent<MeshRenderer>();
         SetIsSelected(false);
         _targetPulse = transform.GetChild(1).GetComponent<MeshRenderer>();
         SetIsTargeted(false);
         _timeTillAggro = 5f;
+        scaledRadius = _type.agentType.radius * ((transform.localScale.x + transform.localScale.z) / 2f); // take an average if it's not round
         // Debug.Log($"'Player' GetMask() = {LayerMask.GetMask("Player")} NameToLayer() = {LayerMask.NameToLayer("Player")}");
         // Debug.Log($"'Enemy' GetMask() = {LayerMask.GetMask("Enemy")} NameToLayer() = {LayerMask.NameToLayer("Enemy")}");
         // Debug.Log($"'{name}'.layer = {gameObject.layer} | LayerToName() = {LayerMask.LayerToName(gameObject.layer)}");
@@ -104,6 +159,7 @@ public class MechBehavior : MonoBehaviour
     void Update()
     {
         _stateDuration += Time.deltaTime;
+        EvasionManuveur = "";
         if (_state == TState.Dead) return;
         
         if (_bGainingAggro && _target == null) _timeGainingAggro += Time.deltaTime;
@@ -124,7 +180,6 @@ public class MechBehavior : MonoBehaviour
             }
         }
         
-        bool is_close_enough;
         switch (_state.Switch)
         {
             case TState.Idle:
@@ -138,80 +193,115 @@ public class MechBehavior : MonoBehaviour
                     SetState(TState.Patroling);
                 }
                 break;
+
             case TState.Patroling:
                 if (tmp_target != null) SetTarget(tmp_target);
                 if (HasReachedDestination()) SetNavDestination(_patrol[++_patrolIdx % _patrol.Length]);
                 break;
+
             case TState.Chasing:
-                if (tmp_target != null && !_playerSetTarget && tmp_target != _target) SetTarget(tmp_target);
-                else if (_target != null) SetNavDestination(_target.transform.position);
-                else if (_target == null && tmp_target == null) 
-                {
-                    SetState(TState.Idle);
-                    break;
-                }
-
-                is_close_enough = true;
-                if (_weapons.Length == 0) is_close_enough = false;
-                foreach (var weapon in _weapons) 
-                {
-                    if (_target == null) break; // we killed our target
-                    if (!FireAt(weapon, _target))
-                    {
-                        is_close_enough = false;
-                    }
-                }
-                if (is_close_enough) SetState(TState.Fighting);
-                break;
             case TState.Fighting:
-                // TODO: some logic for dodging shots or circling enemies or something?
-                if (tmp_target == null && _target == null) 
+            case TState.Retreating:
+                if (tmp_target != null && !_playerSetTarget && tmp_target != _target) SetTarget(tmp_target);
+                if (_target == null && tmp_target == null) 
                 {
                     SetState(TState.Idle);
                     break;
                 }
 
-                is_close_enough = true;
-                if (_weapons.Length == 0) is_close_enough = false;
-                foreach (var weapon in _weapons) 
+                const int angle_checks = 10;
+                var clear_distance = scaledRadius + 1f;
+                int lateral_ratio; Vector3 lateral_dir_blend;
+                var engagment = EngageTarget(_target);
+                switch (engagment)
                 {
-                    if (_target == null) break; // we killed our target
-                    if (!FireAt(weapon, _target))
-                    {
-                        is_close_enough = false;
-                    }
+                    case EEngagment.OutOfRange:
+                    case EEngagment.InRangePartial:
+                        SetState(TState.Chasing);
+                        SetNavDestination(_target.transform.position);
+                        break;
+
+                    case EEngagment.InRangeFull:
+                        SetIsUsingNavAgent(false);
+                        SetState(TState.Fighting);
+                        transform.LookAt(_target.transform, Vector3.up);
+                        
+                        int forward_ratio;
+                        Vector3 forward = -transform.forward;
+                        for (forward_ratio = 0; (forward_ratio-1) < angle_checks; ++forward_ratio)
+                        {
+                            lateral_ratio = angle_checks - forward_ratio;
+                            lateral_dir_blend = (forward * forward_ratio + transform.right * lateral_ratio).normalized;
+                            if (IsDirectionClear(lateral_dir_blend, clear_distance))
+                            {
+                                transform.position += _type.agentType.speed * .5f * Time.deltaTime * lateral_dir_blend;
+                                EvasionManuveur = $"strafe {lateral_dir_blend}";
+                                break;
+                            }
+                        }
+                        if (EvasionManuveur == "")
+                            for (forward_ratio = 0; (forward_ratio-1) < angle_checks; ++forward_ratio)
+                            {
+                                lateral_ratio = angle_checks - forward_ratio;
+                                lateral_dir_blend = (forward * forward_ratio - transform.right * lateral_ratio).normalized;
+                                if (IsDirectionClear(lateral_dir_blend, clear_distance))
+                                {
+                                    transform.position += _type.agentType.speed * .5f * Time.deltaTime * lateral_dir_blend;
+                                    EvasionManuveur = $"strafe {lateral_dir_blend}";
+                                    break;
+                                }
+                            }
+                        // Debug.Log($"{name} - InRange - {EvasionManuveur}");
+                        break;
+                    case EEngagment.TooClose:
+                        SetState(TState.Retreating);
+                        SetIsUsingNavAgent(false);
+                        transform.LookAt(_target.transform.position, Vector3.up);
+                        int back_ratio;
+                        Vector3 back = -transform.forward; 
+                        for (back_ratio = 4; (back_ratio-1) < angle_checks; ++back_ratio)
+                        {
+                            lateral_ratio = angle_checks - back_ratio;
+                            lateral_dir_blend = (back * back_ratio + transform.right * lateral_ratio).normalized;
+                            if (IsDirectionClear(lateral_dir_blend, clear_distance))
+                            {
+                                transform.position += _type.agentType.speed * .65f * Time.deltaTime * lateral_dir_blend;
+                                EvasionManuveur = $"strafe {lateral_dir_blend}";
+                                break;
+                            }
+                        }
+                        if (EvasionManuveur == "")
+                            for (back_ratio = 4; (back_ratio-1) < angle_checks; ++back_ratio)
+                            {
+                                lateral_ratio = angle_checks - back_ratio;
+                                lateral_dir_blend = (back * back_ratio - transform.right * lateral_ratio).normalized;
+                                if (IsDirectionClear(lateral_dir_blend, clear_distance))
+                                {
+                                    transform.position += _type.agentType.speed * .65f * Time.deltaTime * lateral_dir_blend;
+                                    EvasionManuveur = $"strafe {lateral_dir_blend}";
+                                    break;
+                                }
+                            }
+                        if (EvasionManuveur == "" && IsDirectionClear(back, 10f))
+                        {
+                            transform.position += _type.agentType.speed * .65f * Time.deltaTime * back;
+                            EvasionManuveur = "Making Distance";
+                        }
+                        // Debug.Log($"{name} TooClose {EvasionManuveur}");
+                        break;
                 }
-                if (!is_close_enough) SetState(TState.Chasing);
                 break;
-            case TState.Retreating:
-                // TODO: pathfind to a safe place or retreat to a base?
-                break;
+
             case TState.FollowingWaypoint:
-                if (tmp_target != null && tmp_target._target != null)
-                {
-                    foreach (var weapon in _weapons) 
-                    {
-                        if (tmp_target.GetState() == TState.Dead) break;
-                        FireAt(weapon, tmp_target);
-                    }
-                }
-                if (HasReachedDestination()) 
-                {
-                    if (IsSelected()) SetState(TState.AwaitingWaypoint);
-                    else SetState(TState.Idle);
-                    break;
-                }
-                break;
             case TState.AwaitingWaypoint:
                 if (tmp_target != null && tmp_target._target != null)
                 {
-                    foreach (var weapon in _weapons) 
-                    {
-                        if (tmp_target.GetState() == TState.Dead) break;
-                        FireAt(weapon, tmp_target);
-                    }
+                    EngageTarget(tmp_target);
                 }
-                // have some more strict system for directly controlling mechs
+                if (_state == TState.FollowingWaypoint && HasReachedDestination()) 
+                {
+                    SetState( IsSelected() ? TState.AwaitingWaypoint : TState.Idle);
+                }
                 break;
         }
 
@@ -222,6 +312,57 @@ public class MechBehavior : MonoBehaviour
             else stoppedMoving?.Invoke();
             IsMoving = is_moving;
         }
+    }
+    
+    /// <summary>
+    /// Handles firing logic for weapons to reduce wet code
+    /// </summary>
+    /// <returns>EEngagement enum to describe our current distance from the target</returns>
+    private EEngagment EngageTarget(MechBehavior target)
+    {
+        float distance_to_target = Vector3.Distance(transform.position, target.transform.position);
+        if (distance_to_target > enageDistanceStart) return EEngagment.OutOfRange;
+        else if (distance_to_target < engageDistanceFull)
+        {
+            foreach (var weapon in _weapons)
+            {
+                if (target == null) break; // we killed our target
+                if (target._state == TState.Dead) break; // target is dead
+                FireAt(weapon, target);
+            }
+            if (_state != TState.Retreating)
+                return distance_to_target < engageDistanceRetreat ? EEngagment.TooClose : EEngagment.InRangeFull;
+            else 
+                // Add a little buffer to the retreat distance while retreating so that it doesn't flicker between the two states
+                return distance_to_target < (engageDistanceRetreat * 1.5f) ? EEngagment.TooClose : EEngagment.InRangeFull;
+        }
+        else
+        {
+            foreach (var weapon in _weapons)
+            {
+                if (weapon.weaponRange >= distance_to_target)
+                {
+                    if (target == null) break; // we killed our target
+                    if (target._state == TState.Dead) break; // target is dead
+                    FireAt(weapon, target);
+                }
+            }
+            return EEngagment.InRangePartial;
+        }
+    }
+
+    /// <summary>
+    /// Lets you know if a mech has an objestruction in the given distance and direction from its center
+    /// </summary>
+    public bool IsDirectionClear(Vector3 direction, float distance)
+    {
+        
+        return !Physics.Raycast(
+            new Ray(transform.position, direction),
+            distance,
+            LayerMask.GetMask("Static", "Enemy")
+        );
+
     }
 
     /// <summary>
@@ -268,33 +409,36 @@ public class MechBehavior : MonoBehaviour
     /// </summary>
     private void SetState(TState newState)
     {
-        Debug.Log($"\"{gameObject.name}\" is now \"{newState}\"");
         if (newState == _state) return;
+        Debug.Log($"\"{gameObject.name}\" is now \"{newState}\"");
         _statePrev = _state;
         _state = newState;
         stateChange?.Invoke(_state, _statePrev, _stateDuration);
         _stateDuration = 0f;
     }
 
+    private void SetIsUsingNavAgent(bool isUsingNavAgent)
+    {
+        if (isUsingNavAgent == _navMeshAgent.enabled) return;
+        if (!isUsingNavAgent) SetNavDestination(transform.position);
+        _navMeshAgent.enabled = isUsingNavAgent;
+    }
+    
     /// <summary>
     /// for internal setting only, if you're the player use a "Command" method
     /// </summary>
     private void SetNavDestination(Vector3 newDest)
     {
+        if (!_navMeshAgent.enabled) SetIsUsingNavAgent(true);
         _navMeshAgent.destination = newDest;
     }
 
     /// <summary>
-    /// Attempts to fire at the given target, returns true if the shot was executed, false otherwise
+    /// Fires At target (do your own distance check first)
     /// </summary>
-    private bool FireAt(Weapon weapon, MechBehavior target)
+    private void FireAt(Weapon weapon, MechBehavior target)
     {
-        if (weapon.weaponRange < (target.transform.position - transform.position).magnitude) 
-        {   
-            return false;
-        }
         if (weapon.Fire(target.gameObject)) weaponFired?.Invoke();
-        return true;
     }
 
     /// <summary>
