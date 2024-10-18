@@ -62,6 +62,7 @@ public class MechVisualDebugger : MonoBehaviour
         }
 
         _stateText.text = mech.GetState().ToString();
+        // if (mech.EvasionManuveur != "") _stateText.text += $"\n{mech.EvasionManuveur}";
     }    
 
     void LateUpdate()
