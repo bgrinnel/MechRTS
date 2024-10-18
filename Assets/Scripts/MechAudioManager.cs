@@ -56,7 +56,7 @@ public class MechAudioManager : MonoBehaviour
             PlayFromSFXCollection(_footstepSource, mechstepsSFX, false);
         }
     }
-
+    
     private void OnStoppedMoving()
     {
         // PlayFromSFXCollection(_footstepSource, endMechstepsSFX, true);

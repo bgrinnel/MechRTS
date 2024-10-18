@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5eb62794592a95409fed85ae8e3770c, type: 3}
   m_Name: Tanky
   m_EditorClassIdentifier: 
-  maxHealth: 1000
+  maxHealth: 10000
   agentType:
     speed: 8
     angularSpeed: 120
