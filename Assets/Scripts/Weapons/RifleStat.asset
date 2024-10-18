@@ -13,15 +13,15 @@ MonoBehaviour:
   m_Name: RifleStat
   m_EditorClassIdentifier: 
   weaponType: 0
-  weaponRange: 50
+  weaponRange: 20
   weaponDamage: 75
   weaponSalvoReload: 0.8
   weaponSalvoLength: 3
-  weaponShotReload: 0.2
+  weaponShotReload: 0.08
   ammo: 1000
   homing: 0
   projectilePrefab: {fileID: 1203426357206433176, guid: e5706d397d4861c40b1d4a54249da498, type: 3}
-  projectileSpeed: 16
+  projectileSpeed: 70
   projectileRotationSpeed: 0
   maxDistancePredict: 100
   minDistancePredict: 5
