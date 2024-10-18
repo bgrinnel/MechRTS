@@ -108,14 +108,14 @@ public class Projectile : MonoBehaviour
         rb.MoveRotation(Quaternion.RotateTowards(transform.rotation, rotation, _projectileRotationSpeed * Time.deltaTime));
     }
 
-    private void OnCollisionEnter(Collision other)
+    private void OnTriggerEnter(Collider other)
     {
         int other_layer = other.gameObject.layer;
         if (other_layer != gameObject.layer)
         {
-            if (other.collider.CompareTag("Mech"))    // we hit an enemy mech
+            if (other.CompareTag("Mech"))    // we hit an enemy mech
                 _owningMech.HitMech(other.gameObject.GetComponent<MechBehavior>(), _damage);
-            else if (other.collider.CompareTag("Projectile")) Destroy(other.gameObject);
+            else if (other.CompareTag("Projectile")) Destroy(other.gameObject);
             Destroy(gameObject);
         }
         else if (other_layer == LayerMask.NameToLayer("Static"))    // we hit the environment
