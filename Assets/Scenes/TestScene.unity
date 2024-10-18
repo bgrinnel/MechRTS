@@ -4057,6 +4057,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scrollZoomSpeed: 10
   cameraSpeed: 20
+  cameraRotationSpeed: 30
   maxHeight: 30
   minHeight: 1
 --- !u!81 &1764833576
@@ -4126,13 +4127,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1764833574}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.24799618, y: -0.004569062, z: 0.0009567665, w: -0.96874976}
-  m_LocalPosition: {x: -0.5, y: 13.9, z: -30.1}
+  m_LocalRotation: {x: 0.17364816, y: 0, z: 0, w: 0.9848078}
+  m_LocalPosition: {x: -0.4999999, y: 24, z: -30.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 28.718, y: 360.547, z: 0.027}
+  m_LocalEulerAnglesHint: {x: 20, y: 0, z: 0}
 --- !u!114 &1764833579
 MonoBehaviour:
   m_ObjectHideFlags: 0
