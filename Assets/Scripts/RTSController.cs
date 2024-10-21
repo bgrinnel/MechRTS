@@ -26,12 +26,6 @@ public class RTSController : MonoBehaviour
     public bool _holdingCtrl;
     public List<GameObject>[] unitGroups = new List<GameObject>[10];
 
-    [SerializeField]
-    private GameObject playUI;
-    [SerializeField]
-    private GameObject settingsUI;
-    private bool SettingsMenu = false;
-
     private void Awake()
     {
         for (int i = 1; i < unitGroups.Length; i++) 
@@ -45,13 +39,7 @@ public class RTSController : MonoBehaviour
     }
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Escape)){
-            MenuChange();
-        }
-        if(!SettingsMenu){
-            MouseInput();
-        }
-        
+        MouseInput();
     }
     void MouseInput()
     {
@@ -259,25 +247,6 @@ public class RTSController : MonoBehaviour
                 Select(unit);
             }
         }
-    }
-    public void MenuChange()
-    {
-        if(SettingsMenu){
-            playUI.SetActive(true);
-            settingsUI.SetActive(false);
-            SettingsMenu = false;
-        }
-        else{
-            playUI.SetActive(false);
-            settingsUI.SetActive(true);
-            SettingsMenu = true;
-        }
-        
-    }
-    
-    public void ExitButton()
-    {
-        Application.Quit();
     }
     
 }
