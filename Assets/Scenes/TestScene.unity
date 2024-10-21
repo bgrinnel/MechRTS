@@ -647,7 +647,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &87131756
 Transform:
   m_ObjectHideFlags: 0
@@ -3224,7 +3224,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &910622904
 Transform:
   m_ObjectHideFlags: 0
@@ -3981,7 +3981,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1062001644
 Transform:
   m_ObjectHideFlags: 0
@@ -4282,7 +4282,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1246304027
 Transform:
   m_ObjectHideFlags: 0
@@ -5616,8 +5616,8 @@ AudioSource:
   m_GameObject: {fileID: 1764833574}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: -4643295497070875449, guid: cdfa2d0d698e8374f8bf07c586cccac3, type: 2}
+  m_audioClip: {fileID: 8300000, guid: 47de82a985e391d479c97c27b2b14d42, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -5717,6 +5717,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   musicMixer: {fileID: 24100000, guid: fd6b099751cb01741b5863064b808bae, type: 2}
   sfxMixer: {fileID: 24100000, guid: 62e4970102320cf4eab35d02ba75b54d, type: 2}
+  mainMixer: {fileID: 24100000, guid: cdfa2d0d698e8374f8bf07c586cccac3, type: 2}
   musicSlider: {fileID: 584083322}
   sfxSlider: {fileID: 766233670}
 --- !u!1 &1778002168
@@ -5842,7 +5843,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1794730164
 Transform:
   m_ObjectHideFlags: 0
@@ -7078,7 +7079,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!108 &2024895902
 Light:
   m_ObjectHideFlags: 0
