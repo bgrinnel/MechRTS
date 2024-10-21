@@ -12,17 +12,19 @@ public class VolumeController : MonoBehaviour
     [SerializeField]
     private AudioMixer sfxMixer;
     [SerializeField]
+    private AudioMixer mainMixer;
+    [SerializeField]
     private Slider musicSlider;
     [SerializeField]
     private Slider sfxSlider;
 
     public void UpdateMusicVolume(){
         //Debug.Log("music vol");
-        musicMixer.SetFloat("musicVol", musicSlider.value);
+        mainMixer.SetFloat("MusicVol", musicSlider.value);
     }
 
     public void UpdateSFXVolume(){
-        sfxMixer.SetFloat("sfxVol", sfxSlider.value);
+        mainMixer.SetFloat("SfxVol", sfxSlider.value);
     }
    
 }
