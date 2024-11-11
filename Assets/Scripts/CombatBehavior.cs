@@ -30,6 +30,31 @@ public class CombatBehaviour : MonoBehaviour
         
         context.instigator = instigator;
         context.target = target;
+
+        var hitDirection = (instigator.transform.position - target.transform.position).normalized;
+
+        if (Vector3.Dot(hitDirection, target.transform.forward) > 0.5f) // Front
+        {
+            Debug.Log("Hit on Front Armor");
+        }
+
+        else if (Vector3.Dot(hitDirection, -target.transform.forward) > 0.5f) // Back
+        {
+            Debug.Log("Hit on Back Armor");
+        }
+        else if (Vector3.Dot(hitDirection, target.transform.right) > 0.5f) // Right side
+        {
+            Debug.Log("Hit on Right Side Armor");
+        }
+        else if (Vector3.Dot(hitDirection, -target.transform.right) > 0.5f) // Left side
+        {
+            Debug.Log("Hit on Left Side Armor");
+        }
+        else if (Vector3.Dot(hitDirection, target.transform.up) > 0.5f) // Top
+        {
+            Debug.Log("Hit on Top Armor");
+        }
+
         target_health.current -= context.damage.current;
         target_health = target.SetHealth(target_health.current,  context);
         Debug.Log($"{target.gameObject.name}'s Health fell to {target_health.current}");
