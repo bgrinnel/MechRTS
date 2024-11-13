@@ -2421,15 +2421,15 @@ MonoBehaviour:
   m_FillRect: {fileID: 1908760366}
   m_HandleRect: {fileID: 1151997703}
   m_Direction: 0
-  m_MinValue: -20
-  m_MaxValue: 20
+  m_MinValue: -80
+  m_MaxValue: 0
   m_WholeNumbers: 0
-  m_Value: 0
+  m_Value: -20
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: VolumeControl, Assembly-CSharp
+      - m_Target: {fileID: 909366379}
+        m_TargetAssemblyTypeName: VolumeController, Assembly-CSharp
         m_MethodName: UpdateMusicVolume
         m_Mode: 1
         m_Arguments:
@@ -2503,8 +2503,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
+  m_Sprite: {fileID: 21300000, guid: 1ac9c0c7e91538c41ac4f8cadc83b06b, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -2757,8 +2757,8 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: VolumeControl, Assembly-CSharp
+      - m_Target: {fileID: 909366379}
+        m_TargetAssemblyTypeName: VolumeController, Assembly-CSharp
         m_MethodName: UpdateSFXVolume
         m_Mode: 1
         m_Arguments:
@@ -3128,6 +3128,7 @@ GameObject:
   - component: {fileID: 909366377}
   - component: {fileID: 909366376}
   - component: {fileID: 909366375}
+  - component: {fileID: 909366379}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -3218,6 +3219,23 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &909366379
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 909366374}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06960e4b2fa20ed48b575ce00829e527, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  musicMixer: {fileID: 0}
+  sfxMixer: {fileID: 0}
+  mainMixer: {fileID: 0}
+  musicSlider: {fileID: 0}
+  sfxSlider: {fileID: 0}
 --- !u!1 &910622903
 GameObject:
   m_ObjectHideFlags: 0
@@ -3762,7 +3780,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3867819575959378026, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_Speed
-      value: 8
+      value: 16
+      objectReference: {fileID: 0}
+    - target: {fileID: 3867819575959378026, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
+      propertyPath: m_Acceleration
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 3867819575959378026, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
+      propertyPath: m_StoppingDistance
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4141440727896056310, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3820,6 +3846,10 @@ PrefabInstance:
       propertyPath: _isPlayer
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7937762160031891975, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
+      propertyPath: _type
+      value: 
+      objectReference: {fileID: 11400000, guid: acdb593d64e51fb41b0b6db7a81ff88f, type: 2}
     - target: {fileID: 7937762160031891975, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: _patrol.Array.size
       value: 4
@@ -4411,15 +4441,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3867819575959378026, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_Speed
-      value: 8
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 3867819575959378026, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_Acceleration
-      value: 10
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 3867819575959378026, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_AngularSpeed
       value: 120
+      objectReference: {fileID: 0}
+    - target: {fileID: 3867819575959378026, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
+      propertyPath: m_StoppingDistance
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4141440727896056310, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_LocalPosition.x
@@ -4476,7 +4510,7 @@ PrefabInstance:
     - target: {fileID: 7937762160031891975, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: _type
       value: 
-      objectReference: {fileID: 11400000, guid: eccfdc06a2d52514d920c792656dc335, type: 2}
+      objectReference: {fileID: 11400000, guid: acdb593d64e51fb41b0b6db7a81ff88f, type: 2}
     - target: {fileID: 7959164039744268613, guid: aa0d62e96ff8af84388897ef57ef9642, type: 3}
       propertyPath: m_LocalPosition.x
       value: 41.5
@@ -5521,8 +5555,8 @@ MonoBehaviour:
   scrollZoomSpeed: 10
   cameraSpeed: 20
   cameraRotationSpeed: 30
-  maxHeight: 30
-  minHeight: 1
+  maxHeight: 40
+  minHeight: 5
 --- !u!81 &1764833576
 AudioListener:
   m_ObjectHideFlags: 0

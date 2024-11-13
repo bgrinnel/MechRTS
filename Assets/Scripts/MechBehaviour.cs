@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor.Experimental.GraphView;
+//using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UIElements;
@@ -429,6 +429,7 @@ public class MechBehavior : MonoBehaviour
     /// </summary>
     private void SetNavDestination(Vector3 newDest)
     {
+        if (_state == TState.Dead) return;
         if (!_navMeshAgent.enabled) SetIsUsingNavAgent(true);
         _navMeshAgent.destination = newDest;
     }
@@ -581,6 +582,7 @@ public class MechBehavior : MonoBehaviour
     public bool IsSelected() { return _selectionPulse.enabled; } 
     public void SetIsSelected(bool isSelected)
     {
+        if (_state == TState.Dead) return;
         Debug.Log($"Setting is Selected {isSelected}");
         _selectionPulse.enabled = isSelected;
         if (_target != null) _target.SetIsTargeted(isSelected);

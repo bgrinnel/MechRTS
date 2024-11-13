@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponType: 0
   weaponRange: 20
-  weaponDamage: 75
+  weaponDamage: 200
   weaponSalvoReload: 0.8
   weaponSalvoLength: 3
   weaponShotReload: 0.08
