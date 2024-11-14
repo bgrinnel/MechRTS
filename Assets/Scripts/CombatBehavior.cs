@@ -57,7 +57,7 @@ public class CombatBehaviour : MonoBehaviour
 
         target_health.current -= context.damage.current;
         target_health = target.SetHealth(target_health.current,  context);
-        Debug.Log($"{target.gameObject.name}'s Health fell to {target_health.current}");
+        // Debug.Log($"{target.gameObject.name}'s Health fell to {target_health.current}");
         if (target_health.current <= target_health.min)
         {
             if (instigator != null) instigator.defeatedAgent?.Invoke(target, context);

@@ -90,7 +90,7 @@ public class WeaponMount : MonoBehaviour
     {
         _target = target;
     }
-    public void InitalizeWeaponMount(WeaponMountScriptable weaponMountStats, WeaponScriptable scriptable, MechBehavior _mechBehavior)
+    public void InitalizeWeaponMount(WeaponMountScriptable weaponMountStats, WeaponScriptable scriptable, BaseMech _mechBehavior)
     {
         _leftRotationLimit = weaponMountStats.leftRorationLimit;
         _rightRotationLimit = weaponMountStats.rightRorationLimit;

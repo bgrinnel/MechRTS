@@ -7,7 +7,7 @@ public class Projectile : MonoBehaviour
     private bool _homing;
     private float _damage, _speed, _maxDistancePredict, _minDistancePredict, _maxTimePrediction, _projectileRotationSpeed;
     private Vector3 _standardPrediction, _deviatedPrediction;
-    private MechBehavior _owningMech;
+    private BaseMech _owningMech;
     [SerializeField] private float _deviationAmount = 5;
     [SerializeField] private float _deviationSpeed = 2;
 
@@ -66,7 +66,7 @@ public class Projectile : MonoBehaviour
         _homing = homing;
     }
 
-    public void InitializeProjectile(float damage, float speed, MechBehavior owningMech, GameObject target = null)
+    public void InitializeProjectile(float damage, float speed, BaseMech owningMech, GameObject target = null)
     {
         _damage = damage;
         _speed = speed;
@@ -114,7 +114,7 @@ public class Projectile : MonoBehaviour
         if (other_layer != gameObject.layer)
         {
             if (other.CompareTag("Mech"))    // we hit an enemy mech
-                _owningMech.HitMech(other.gameObject.GetComponent<MechBehavior>(), _damage);
+                _owningMech.HitMech(other.gameObject.GetComponent<BaseMech>(), _damage);
             else if (other.CompareTag("Projectile")) Destroy(other.gameObject);
             Destroy(gameObject);
         }

@@ -5,7 +5,7 @@ using UnityEngine;
 public class Weapon : MonoBehaviour
 {
     [SerializeField]
-    private MechBehavior owningMech;
+    private BaseMech owningMech;
 
     [SerializeField]
     private WeaponScriptable weaponStats;
@@ -126,7 +126,7 @@ public class Weapon : MonoBehaviour
 
     private void DirectEffect(GameObject target)
     {
-        owningMech.HitMech(target.gameObject.GetComponent<MechBehavior>(), weaponDamage);
+        owningMech.HitMech(target.gameObject.GetComponent<BaseMech>(), weaponDamage);
     }
 
     private void Area()
@@ -139,7 +139,7 @@ public class Weapon : MonoBehaviour
         target = designatedTarget;
     }
 
-    public void Instantiate(WeaponScriptable scriptable, MechBehavior mech)
+    public void Instantiate(WeaponScriptable scriptable, BaseMech mech)
     {
         owningMech = mech;
         weaponStats = scriptable;

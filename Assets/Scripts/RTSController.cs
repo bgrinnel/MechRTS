@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using System.Linq;
 
 public class RTSController : MonoBehaviour
 {
@@ -19,9 +20,9 @@ public class RTSController : MonoBehaviour
     [SerializeField] private GameObject moveTargetEffect;
 
 
-    [SerializeField] private List<GameObject> _playerUnits = new List<GameObject>();
+    [SerializeField] private List<GameObject> _playerUnits;
 
-    [SerializeField] private List<GameObject> _selectedUnits = new List<GameObject>();
+    [SerializeField] private List<GameObject> _selectedUnits;
     public bool _shiftPressed;
     public bool _holdingCtrl;
     public List<GameObject>[] unitGroups = new List<GameObject>[10];
@@ -34,6 +35,8 @@ public class RTSController : MonoBehaviour
 
     private void Awake()
     {
+        if (_playerUnits == null) _playerUnits = new();
+        _selectedUnits = new();
         for (int i = 1; i < unitGroups.Length; i++) 
         {
             unitGroups[i] = new List<GameObject>();
@@ -99,9 +102,9 @@ public class RTSController : MonoBehaviour
             screenPos = Input.mousePosition;
             Ray ray = Camera.main.ScreenPointToRay(screenPos);
             if(Physics.Raycast(ray,  out RaycastHit hitData2, 1000, enemyLayerMask)){
-                var mech = hitData2.collider.gameObject.GetComponent<MechBehavior>();
+                var mech = hitData2.collider.gameObject.GetComponent<BaseMech>();
                 foreach (var unit in _selectedUnits){
-                    unit.GetComponent<MechBehavior>().CommandSetTarget(mech);
+                    unit.GetComponent<BaseMech>().CommandSetTarget(mech);
                 }
             }
             else RightMouseClick();
@@ -170,7 +173,7 @@ public class RTSController : MonoBehaviour
 
         screenPos = Input.mousePosition;
         Ray ray = Camera.main.ScreenPointToRay(screenPos);
-        if(Physics.Raycast(ray,  out RaycastHit hitData, 100, unitLayerMask)){
+        if(Physics.Raycast(ray,  out RaycastHit hitData, 1000, unitLayerMask)){
             GameObject clickedUnit = hitData.collider.gameObject;
             DeSelectAll();
             Select(clickedUnit);
@@ -202,9 +205,18 @@ public class RTSController : MonoBehaviour
             GameObject splashEffect = Instantiate(moveTargetEffect, worldPos, transform.rotation);
             Destroy(splashEffect, 0.5f);
 
+            int num_selected = _selectedUnits.Count;
+            Vector3 center = Vector3.zero; 
+            foreach (var unit in _selectedUnits) center += unit.transform.position;
+            center /= num_selected;
             foreach (var unit in _selectedUnits){
-                MechBehavior mech = unit.GetComponent<MechBehavior>();
-                mech.CommandSetWaypoint(worldPos);
+                BaseMech mech = unit.GetComponent<BaseMech>();
+                if (num_selected == 1) mech.CommandSetWaypoint(worldPos);
+                else
+                {
+                    Vector3 dir_to_mech = (unit.transform.position - center).normalized;
+                    mech.CommandSetWaypoint(worldPos + dir_to_mech * mech.ScaledRadius * 1.2f);
+                }
             }
         }
         
@@ -214,7 +226,7 @@ public class RTSController : MonoBehaviour
     public void Select(GameObject unit)
     {
         _selectedUnits.Add(unit);
-        unit.GetComponent<MechBehavior>().SetIsSelected(true);
+        unit.GetComponent<BaseMech>().SetIsSelected(true);
     }
 
     public List<GameObject> Selected()
@@ -227,13 +239,13 @@ public class RTSController : MonoBehaviour
         if (_selectedUnits.Contains(unit))
         {
             _selectedUnits.Remove(unit);
-            unit.GetComponent<MechBehavior>().SetIsSelected(false);
+            unit.GetComponent<BaseMech>().SetIsSelected(false);
         }
     }
 
     public void DeSelectAll()
     {
-        foreach (var unit in _selectedUnits) unit.GetComponent<MechBehavior>().SetIsSelected(false);
+        foreach (var unit in _selectedUnits) unit.GetComponent<BaseMech>().SetIsSelected(false);
         _selectedUnits.Clear();
     }
 

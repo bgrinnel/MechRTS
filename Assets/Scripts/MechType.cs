@@ -11,7 +11,7 @@ public class MechType : ScriptableObject
     /// </summary>
     /// <param name="mechs"></param>
     /// <returns></returns>
-    public delegate MechBehavior SelectionAlgorithm(MechBehavior selector, params MechBehavior[] mechs);
+    public delegate BaseMech SelectionAlgorithm(BaseMech selector, params BaseMech[] mechs);
 
     /// <summary>
     /// The max health of this mech
@@ -69,15 +69,15 @@ public class MechType : ScriptableObject
 
 public static class SelectionAlg
 {
-    public static MechBehavior LowestHealth(MechBehavior selector, params MechBehavior[] mechs)
+    public static BaseMech LowestHealth(BaseMech selector, params BaseMech[] mechs)
     {
-        return mechs.OrderBy((mech) => mech.combatBehaviour.GetHealth().current).First();
+        return mechs.OrderBy((mech) => mech.CombatBehviour.GetHealth().current).First();
     }
-    public static MechBehavior Closest(MechBehavior selector, params MechBehavior[] mechs)
+    public static BaseMech Closest(BaseMech selector, params BaseMech[] mechs)
     {
         return mechs.OrderBy((mech) => (selector.transform.position - mech.transform.position).sqrMagnitude).First();
     }
-    public static MechBehavior HighestHealth(MechBehavior selector, params MechBehavior[] mechs)
+    public static BaseMech HighestHealth(BaseMech selector, params BaseMech[] mechs)
     {
         return mechs.OrderByDescending((mech) => (selector.transform.position - mech.transform.position).sqrMagnitude).First();
     }
