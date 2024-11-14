@@ -75,12 +75,13 @@ public class MechAudioManager : MonoBehaviour
 
     private void PlayFromSFXCollection(AudioSource source, SFXCollection sfx, bool stopSourceFirst)
     {
+        
         if (stopSourceFirst) source.Stop();
         if (sfx.audioClips.Length == 0) return;
         var audio_clip = sfx.audioClips[Random.Range(0, sfx.audioClips.Length-1)];
-        float audio_volume = Random.Range(1f - sfx.deviationVolume, 1f);
+        //float audio_volume = Random.Range(1f - sfx.deviationVolume, 1f);
         source.pitch = Random.Range(1f - sfx.deviationPitch, 1f + sfx.deviationPitch);
-        source.PlayOneShot(audio_clip, audio_volume);
+        source.PlayOneShot(audio_clip, 1f);
     }
     // a looooot of event functions
 }
