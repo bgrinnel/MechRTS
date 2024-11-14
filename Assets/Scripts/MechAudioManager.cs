@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Audio;
 
-[RequireComponent(typeof(MechBehavior))]
+[RequireComponent(typeof(BaseMech))]
 public class MechAudioManager : MonoBehaviour
 {
     [Tooltip("The audio effects \"collection\" to be played when a Mech starts walking and at footfall intervals")]
@@ -19,7 +19,7 @@ public class MechAudioManager : MonoBehaviour
     // internal component references
     private AudioSource _footstepSource;
     private AudioSource _gunfireSource;
-    private MechBehavior _mechBehaviour;
+    private BaseMech _mechBehaviour;
 
     /// <summary>
     /// The time since the mechs last footfall while moving
@@ -40,15 +40,15 @@ public class MechAudioManager : MonoBehaviour
         _gunfireSource = gameObject.AddComponent<AudioSource>();
         _gunfireSource.spatialBlend = 1f;
         _gunfireSource.outputAudioMixerGroup = sfxMixerGroup;
-        _mechBehaviour = gameObject.GetComponent<MechBehavior>();
-        _mechBehaviour.stoppedMoving += OnStoppedMoving;
-        _mechBehaviour.startedMoving += OnStartedMoving;
-        _mechBehaviour.weaponFired += OnGunfire;
+        _mechBehaviour = gameObject.GetComponent<BaseMech>();
+        _mechBehaviour.StoppedMoving += OnStoppedMoving;
+        _mechBehaviour.StartedMoving += OnStartedMoving;
+        _mechBehaviour.WeaponFired += OnGunfire;
     }
 
     private void Update()
     {
-        if (_mechBehaviour.GetState() == TState.Dead) return;
+        if (_mechBehaviour.State == TState.Dead) return;
         if (_mechBehaviour.IsMoving) _secondsMoving += Time.deltaTime;
         if (_secondsMoving >= _secondsBetweenFootfalls)
         {

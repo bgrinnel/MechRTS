@@ -99,9 +99,9 @@ public class RTSController : MonoBehaviour
             screenPos = Input.mousePosition;
             Ray ray = Camera.main.ScreenPointToRay(screenPos);
             if(Physics.Raycast(ray,  out RaycastHit hitData2, 1000, enemyLayerMask)){
-                var mech = hitData2.collider.gameObject.GetComponent<MechBehavior>();
+                var mech = hitData2.collider.gameObject.GetComponent<BaseMech>();
                 foreach (var unit in _selectedUnits){
-                    unit.GetComponent<MechBehavior>().CommandSetTarget(mech);
+                    unit.GetComponent<BaseMech>().CommandSetTarget(mech);
                 }
             }
             else RightMouseClick();
@@ -203,7 +203,7 @@ public class RTSController : MonoBehaviour
             Destroy(splashEffect, 0.5f);
 
             foreach (var unit in _selectedUnits){
-                MechBehavior mech = unit.GetComponent<MechBehavior>();
+                BaseMech mech = unit.GetComponent<BaseMech>();
                 mech.CommandSetWaypoint(worldPos);
             }
         }
@@ -214,7 +214,7 @@ public class RTSController : MonoBehaviour
     public void Select(GameObject unit)
     {
         _selectedUnits.Add(unit);
-        unit.GetComponent<MechBehavior>().SetIsSelected(true);
+        unit.GetComponent<BaseMech>().SetIsSelected(true);
     }
 
     public List<GameObject> Selected()
@@ -227,13 +227,13 @@ public class RTSController : MonoBehaviour
         if (_selectedUnits.Contains(unit))
         {
             _selectedUnits.Remove(unit);
-            unit.GetComponent<MechBehavior>().SetIsSelected(false);
+            unit.GetComponent<BaseMech>().SetIsSelected(false);
         }
     }
 
     public void DeSelectAll()
     {
-        foreach (var unit in _selectedUnits) unit.GetComponent<MechBehavior>().SetIsSelected(false);
+        foreach (var unit in _selectedUnits) unit.GetComponent<BaseMech>().SetIsSelected(false);
         _selectedUnits.Clear();
     }
 

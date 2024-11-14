@@ -3,7 +3,7 @@ using UnityEditor;
 using System.Collections.Generic;
 using UnityEngine.AI;
 
-[CustomEditor(typeof(MechBehavior))]
+[CustomEditor(typeof(BaseMech))]
 public class MechBehaviourEditor : Editor
 {  
     private SerializedProperty _serializedPatrol;
@@ -51,7 +51,7 @@ public class MechBehaviourEditor : Editor
 
 
         // so much bullshit
-        var mech = (MechBehavior)target;
+        var mech = (BaseMech)target;
         _serializedParent = new SerializedObject(mech.gameObject);
         _serializedParent_layer = _serializedParent.FindProperty("m_Layer");
         _serializedParent_tag = _serializedParent.FindProperty("m_TagString"); 
@@ -112,7 +112,7 @@ public class MechBehaviourEditor : Editor
     public override void OnInspectorGUI()
     {
         serializedObject.Update();
-        var mech = (MechBehavior)target;
+        var mech = (BaseMech)target;
 
         EditorGUILayout.PropertyField(_serializedIsPlayer);
         EditorGUILayout.PropertyField(_serializedType);
@@ -144,7 +144,7 @@ public class MechBehaviourEditor : Editor
         if (serializedObject.ApplyModifiedProperties() || _OnEnable)
         {   
             var mech_type = (MechType)_serializedType.objectReferenceValue;
-            _serializedParent_layer.intValue = LayerMask.NameToLayer(mech.IsPlayerMech() ? "Player" : "Enemy");
+            _serializedParent_layer.intValue = LayerMask.NameToLayer(mech.IsPlayerMech ? "Player" : "Enemy");
             _serializedParent_tag.stringValue = "Mech"; 
 
             _serializedAgent_speed.floatValue = mech_type.agentType.speed;
