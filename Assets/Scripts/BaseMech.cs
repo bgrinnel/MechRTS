@@ -450,6 +450,7 @@ public abstract class BaseMech : MonoBehaviour
     /// </summary>
     protected void SetNavDestination(Vector3 newDest)
     {
+        if (_currentState == TState.Dead) return;
         if (!_navMeshAgent.enabled) SetIsUsingNavAgent(true);
         _navMeshAgent.destination = newDest;
     }
@@ -594,6 +595,7 @@ public abstract class BaseMech : MonoBehaviour
     /// </summary>
     public void SetIsSelected(bool isSelected)
     {
+        if (_currentState == TState.Dead) return;
         if (_selectionPulse == null) return;
         _selectionPulse.enabled = isSelected;
         if (_target != null) _target.SetIsTargeted(isSelected);

@@ -64,8 +64,9 @@ public class PlayerMech : BaseMech
             case TState.AwaitingWaypoint:
                 if (NavMeshAgent.remainingDistance < ScaledRadius * 6f)
                 {
+                    Vector3 destination = NavMeshAgent.destination;
                     //  TODO: not a perfect solution to bumping - may need changed
-                    if (OverlapCapsule(NavMeshAgent.destination, out Collider[] hits, "Enemy", "Player"))
+                    if (OverlapCapsule(destination, out Collider[] hits, "Enemy", "Player"))
                     {
                         var mech = hits[0].GetComponent<BaseMech>();
                         if (mech == null)
@@ -74,7 +75,12 @@ public class PlayerMech : BaseMech
                             break;
                         }
                         var direction_to_self = (transform.position - mech.transform.position).normalized;
-                        SetNavDestination(NavMeshAgent.destination + direction_to_self * (ScaledRadius + mech.ScaledRadius));
+                        // var direction_to_mech = (mech.transform.position - transform.position).normalized;
+                        SetNavDestination(destination + direction_to_self * ScaledRadius * 1.5f);
+                        // if (mech is PlayerMech player_mech && (mech.NavMeshAgent.destination - destination).magnitude < mech.ScaledRadius)
+                        // {
+                        //     player_mech.SetNavDestination(destination + direction_to_mech * mech.ScaledRadius * 1.5f);
+                        // }
                     }
                 }
                 if (state == TState.FollowingWaypoint && HasReachedDestination()) 
