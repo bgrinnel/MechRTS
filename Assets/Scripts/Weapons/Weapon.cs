@@ -63,6 +63,24 @@ public class Weapon : MonoBehaviour
         get { return weaponStats.homing; }
         private set { weaponStats.homing = value; }
     }
+    [SerializeField]
+    public float accBase
+    {
+        get { return weaponStats.baseAccuracy; }
+        private set { weaponStats.baseAccuracy = value; }
+    }
+    [SerializeField]
+    public float accIncrement
+    {
+        get { return weaponStats.AccuracyIncrement; }
+        private set { weaponStats.AccuracyIncrement = value; }
+    }
+    [SerializeField]
+    public float accFactor
+    {
+        get { return weaponStats.AccuracyFactor; }
+        private set { weaponStats.AccuracyFactor = value; }
+    }
 
     public GameObject target;
     private bool _isReloading;
@@ -158,5 +176,48 @@ public class Weapon : MonoBehaviour
     public float GetProjectileSpeed()
     {
         return weaponStats.projectileSpeed;
+    }
+
+    public bool InRange(GameObject target)
+    {
+        if (target != null)
+        {
+            float distanceToTarget = GetTargetDistance(target);
+            if (distanceToTarget > weaponRange)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public float GetTargetDistance(GameObject target)
+    {
+        var horiTarget = new Vector3(target.transform.position.x, 0, target.transform.position.z);
+        var horiWeapon = new Vector3(transform.position.x, 0, target.transform.position.z);
+        var distanceToTarget = Vector3.Distance(horiWeapon, horiTarget);
+        return distanceToTarget;
+    } 
+
+    public float AccCalculator(GameObject target)
+    {
+        if (InRange(target))
+        {
+            var distanceToTarget = GetTargetDistance(target);
+            var disatnceFromRange = weaponRange - distanceToTarget;
+            var accuracy = accBase + accIncrement * ((int)disatnceFromRange / accFactor);
+            return accuracy;
+        }
+        else
+        {
+            return 0;
+        }
     }
 }
