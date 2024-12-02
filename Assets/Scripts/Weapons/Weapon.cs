@@ -220,4 +220,17 @@ public class Weapon : MonoBehaviour
             return 0;
         }
     }
+
+    private bool HitCheck(float weaponAccuracy)
+    {
+        var acc = Random.Range(0, 100);
+        if (acc < weaponAccuracy)
+        {
+            return true ;
+        }
+        else
+        {
+            return false;
+        }
+    }
 }
