@@ -226,7 +226,7 @@ public abstract class BaseMech : MonoBehaviour
         {
             _weapons[i] = gameObject.AddComponent<Weapon>();
             _weapons[i].Instantiate(_type.weapons[i], this);
-            float weapon_range = _weapons[i].weaponRange;
+            float weapon_range = _weapons[i].weaponMaxRange;
             if (weapon_range > _enageDistanceStart) _enageDistanceStart = weapon_range;
             if (weapon_range < _engageDistanceFull) _engageDistanceFull =  weapon_range;
         }
@@ -324,7 +324,7 @@ public abstract class BaseMech : MonoBehaviour
         {
             foreach (var weapon in _weapons)
             {
-                if (weapon.weaponRange >= distance_to_target)
+                if (weapon.weaponMaxRange >= distance_to_target)
                 {
                     if (target == null) break; // we killed our target
                     if (target._currentState == TState.Dead) break; // target is dead

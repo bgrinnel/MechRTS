@@ -11,18 +11,6 @@ public class Weapon : MonoBehaviour
     private WeaponScriptable weaponStats;
 
     [SerializeField]
-    public float weaponRange
-    {
-        get { return weaponStats.weaponRange; }
-        private set { weaponStats.weaponRange = value; }
-    }
-    [SerializeField]
-    public float weaponDamage
-    {
-        get { return weaponStats.weaponDamage; }
-        private set { weaponStats.weaponDamage = value; }
-    }
-    [SerializeField]
     public float SalvoReloadSec
     {
         get { return weaponStats.weaponSalvoReload; }
@@ -64,23 +52,55 @@ public class Weapon : MonoBehaviour
         private set { weaponStats.homing = value; }
     }
     [SerializeField]
-    public float accBase
+    public float weaponMaxDamage
     {
-        get { return weaponStats.baseAccuracy; }
-        private set { weaponStats.baseAccuracy = value; }
+        get { return weaponStats.weaponMaxDamage; }
+        private set { weaponStats.weaponMaxDamage = value; }
+    }
+
+    [SerializeField]
+    public float weaponMinDamage
+    {
+        get { return weaponStats.weaponMinDamage; }
+        private set { weaponStats.weaponMinDamage = value; }
+    }
+
+    [SerializeField]
+    public float weaponMaxRange
+    {
+        get { return weaponStats.maximumRange; }
+        private set { weaponStats.maximumRange = value; }
+    }
+
+    [SerializeField]
+    public float weaponMinRange
+    {
+        get { return weaponStats.minimumRange; }
+        private set { weaponStats.minimumRange = value; }
+    }
+
+    [SerializeField]
+    public float weaponEffectiveRange
+    {
+        get { return weaponStats.effectiveRange; }
+        private set { weaponStats.effectiveRange = value; }
     }
     [SerializeField]
-    public float accIncrement
+    private float weaponMaxAcc
     {
-        get { return weaponStats.AccuracyIncrement; }
-        private set { weaponStats.AccuracyIncrement = value; }
+        get { return weaponStats.weaponMaxAccuracy; }
+        set { weaponStats.weaponMaxAccuracy = value; }
     }
+
     [SerializeField]
-    public float accFactor
+    private float weaponMinAcc
     {
-        get { return weaponStats.AccuracyFactor; }
-        private set { weaponStats.AccuracyFactor = value; }
+        get { return weaponStats.weaponMinAccuracy; }
+        set { weaponStats.weaponMinAccuracy = value; }
     }
+
+    public AnimationCurve accuracyCurve = AnimationCurve.Linear(0, 0, 1, 1);
+    public AnimationCurve damageCurve = AnimationCurve.Linear(0, 0, 1, 1);
 
     public GameObject target;
     private bool _isReloading;
@@ -128,14 +148,14 @@ public class Weapon : MonoBehaviour
         var projectile = Instantiate(weaponStats.projectilePrefab, transform.position,transform.rotation);
         projectile.transform.LookAt(target.transform);
         projectile.GetComponent<Projectile>().SetMode(0);
-        projectile.GetComponent<Projectile>().InitializeProjectile(weaponDamage, weaponStats.projectileSpeed, owningMech);
+        projectile.GetComponent<Projectile>().InitializeProjectile(CalculateDamage(target), weaponStats.projectileSpeed, owningMech);
     }
 
     private void MissileSalvo(GameObject target = null)
     {
         var missile = Instantiate(weaponStats.projectilePrefab, transform.position, transform.rotation);
         missile.GetComponent<Projectile>().SetMode(1, homing);
-        missile.GetComponent<Projectile>().InitializeProjectile(weaponDamage, weaponStats.projectileSpeed, owningMech, target);
+        missile.GetComponent<Projectile>().InitializeProjectile(CalculateDamage(target), weaponStats.projectileSpeed, owningMech, target);
         if (homing)
         {
             missile.GetComponent<Projectile>().InitializeHoming(weaponStats.minDistancePredict, weaponStats.minDistancePredict, weaponStats.maxTimePrediction, weaponStats.projectileRotationSpeed);
@@ -144,7 +164,7 @@ public class Weapon : MonoBehaviour
 
     private void DirectEffect(GameObject target)
     {
-        owningMech.HitMech(target.gameObject.GetComponent<BaseMech>(), weaponDamage);
+        owningMech.HitMech(target.gameObject.GetComponent<BaseMech>(), CalculateDamage(target));
     }
 
     private void Area()
@@ -161,8 +181,11 @@ public class Weapon : MonoBehaviour
     {
         owningMech = mech;
         weaponStats = scriptable;
-        weaponRange = scriptable.weaponRange;
-        weaponDamage = scriptable.weaponDamage;
+        weaponMaxDamage = scriptable.weaponMaxDamage;
+        weaponMinDamage = scriptable.weaponMinDamage;
+        weaponMaxRange = scriptable.maximumRange;
+        weaponMinRange = scriptable.minimumRange;
+        weaponEffectiveRange = scriptable.effectiveRange;
         SalvoReloadSec = scriptable.weaponSalvoReload;
         SalvoLength = scriptable.weaponSalvoLength;
         ShotReloadSec = scriptable.weaponShotReload;
@@ -178,12 +201,39 @@ public class Weapon : MonoBehaviour
         return weaponStats.projectileSpeed;
     }
 
+    public float CalculateDamage(GameObject target)
+    {
+        if (InRange(target))
+        {
+            float distanceToTarget = GetTargetDistance(target);
+            if (distanceToTarget > weaponEffectiveRange)
+            {
+                float xIndex = (weaponMaxRange - distanceToTarget)/(weaponMaxRange - weaponEffectiveRange);
+                float indexInverse = 1f - xIndex;
+                var effctiveDamage = damageCurve.Evaluate(indexInverse) * (weaponMaxDamage - weaponMinDamage);
+                return effctiveDamage;
+            }
+            else if (distanceToTarget < weaponEffectiveRange)
+            {
+                return weaponMaxDamage;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
     public bool InRange(GameObject target)
     {
         if (target != null)
         {
             float distanceToTarget = GetTargetDistance(target);
-            if (distanceToTarget > weaponRange)
+            if (distanceToTarget > weaponMaxRange)
             {
                 return true;
             }
@@ -211,8 +261,19 @@ public class Weapon : MonoBehaviour
         if (InRange(target))
         {
             var distanceToTarget = GetTargetDistance(target);
-            var disatnceFromRange = weaponRange - distanceToTarget;
-            var accuracy = accBase + accIncrement * ((int)disatnceFromRange / accFactor);
+            var weaponAccuracy = 0f;
+            if (distanceToTarget > weaponEffectiveRange)
+            {
+                float xIndex = (weaponMaxRange - distanceToTarget) / (weaponMaxRange - weaponEffectiveRange);
+                float indexInverse = 1f - xIndex;
+                var effctiveAccuracy = damageCurve.Evaluate(indexInverse) * (weaponMaxAcc - weaponMinAcc);
+                weaponAccuracy = effctiveAccuracy;
+            }
+            else
+            {
+                weaponAccuracy = weaponMaxAcc;
+            }
+            var accuracy = weaponAccuracy;
             return accuracy;
         }
         else

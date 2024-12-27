@@ -8,8 +8,8 @@ public class WeaponScriptable : ScriptableObject
 {
     public enum WeaponType { Kenetic, Missile, Area, DirectEffect }
     public WeaponType weaponType = WeaponType.Kenetic;
-    public float weaponRange;
-    public float weaponDamage;
+    public float weaponMaxDamage;
+    public float weaponMinDamage;
     public float weaponSalvoReload;
     public int weaponSalvoLength;
     public float weaponShotReload;
@@ -21,8 +21,10 @@ public class WeaponScriptable : ScriptableObject
     public float maxDistancePredict = 100;
     public float minDistancePredict = 5;
     public float maxTimePrediction = 5;
-    public float baseAccuracy;
-    public float AccuracyIncrement;
-    public float AccuracyFactor;
+    public float effectiveRange;
+    public float maximumRange;
+    public float minimumRange;
+    public float weaponMaxAccuracy;
+    public float weaponMinAccuracy;
 }
 
