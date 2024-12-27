@@ -98,9 +98,18 @@ public class Weapon : MonoBehaviour
         get { return weaponStats.weaponMinAccuracy; }
         set { weaponStats.weaponMinAccuracy = value; }
     }
-
-    public AnimationCurve accuracyCurve = AnimationCurve.Linear(0, 0, 1, 1);
-    public AnimationCurve damageCurve = AnimationCurve.Linear(0, 0, 1, 1);
+    [SerializeField]
+    private AnimationCurve accuracyCurve
+    {
+        get { return weaponStats.weaponAccuracyCurve; }
+        set { weaponStats.weaponAccuracyCurve = value; }
+    }
+    [SerializeField]
+    private AnimationCurve damageCurve
+    {
+        get { return weaponStats.weaponDamageCurve; }
+        set { weaponStats.weaponDamageCurve = value; }
+    }
 
     public GameObject target;
     private bool _isReloading;

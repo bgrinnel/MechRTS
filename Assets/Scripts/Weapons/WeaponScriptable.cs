@@ -26,5 +26,7 @@ public class WeaponScriptable : ScriptableObject
     public float minimumRange;
     public float weaponMaxAccuracy;
     public float weaponMinAccuracy;
+    public AnimationCurve weaponAccuracyCurve = AnimationCurve.Linear(0, 0, 1, 1);
+    public AnimationCurve weaponDamageCurve = AnimationCurve.Linear(0, 0, 1, 1);
 }
 
