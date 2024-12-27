@@ -26,3 +26,6 @@ MonoBehaviour:
   maxDistancePredict: 100
   minDistancePredict: 5
   maxTimePrediction: 6
+  baseAccuracy: 0
+  AccuracyIncrement: 0
+  AccuracyFactor: 0

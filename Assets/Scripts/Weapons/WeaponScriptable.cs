@@ -21,5 +21,8 @@ public class WeaponScriptable : ScriptableObject
     public float maxDistancePredict = 100;
     public float minDistancePredict = 5;
     public float maxTimePrediction = 5;
+    public float baseAccuracy;
+    public float AccuracyIncrement;
+    public float AccuracyFactor;
 }
 

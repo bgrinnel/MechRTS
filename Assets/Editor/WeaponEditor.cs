@@ -20,6 +20,9 @@ public class WeaponEditor : Editor
     private SerializedProperty _maxDistancePredict;
     private SerializedProperty _minDistancePredict;
     private SerializedProperty _maxTimePrediction;
+    private SerializedProperty _accBase;
+    private SerializedProperty _accIncrement;
+    private SerializedProperty _accFatcor;
 
     public void OnEnable()
     {
@@ -37,6 +40,9 @@ public class WeaponEditor : Editor
         _maxDistancePredict = serializedObject.FindProperty("maxDistancePredict");
         _minDistancePredict = serializedObject.FindProperty("minDistancePredict");
         _maxTimePrediction = serializedObject.FindProperty("maxTimePrediction");
+        _accBase = serializedObject.FindProperty("baseAccuracy");
+        _accIncrement = serializedObject.FindProperty("AccuracyIncrement");
+        _accFatcor = serializedObject.FindProperty("AccuracyFactor");
     }
 
     public override void OnInspectorGUI()
@@ -65,7 +71,7 @@ public class WeaponEditor : Editor
             {
                 EditorGUILayout.PropertyField(_projectileRotationSpeed);
                 EditorGUILayout.Space();
-                EditorGUILayout.LabelField("Weapon P", EditorStyles.boldLabel);
+                EditorGUILayout.LabelField("Projectile Properties", EditorStyles.boldLabel);
                 EditorGUILayout.PropertyField(_maxDistancePredict);
                 EditorGUILayout.PropertyField(_minDistancePredict);
                 EditorGUILayout.PropertyField(_maxTimePrediction);
@@ -78,6 +84,12 @@ public class WeaponEditor : Editor
             EditorGUILayout.PropertyField(_projectilePrefab);
             EditorGUILayout.PropertyField(_projectileSpeed);
         }
+
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField("Weapon accuracy", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(_accBase);
+        EditorGUILayout.PropertyField(_accIncrement);
+        EditorGUILayout.PropertyField(_accFatcor);
 
 
         serializedObject.ApplyModifiedProperties();
