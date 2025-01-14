@@ -7,7 +7,7 @@ using UnityEngine;
 public class MechType : ScriptableObject
 {
     /// <summary>
-    /// A generic delegate to be used as a function type declaration for c
+    /// A generic delegate to be used as the function template for all mech slection algorithmns
     /// </summary>
     /// <param name="mechs"></param>
     /// <returns></returns>
@@ -19,17 +19,15 @@ public class MechType : ScriptableObject
     public float maxHealth;
 
     /// <summary>
-    /// A struct for wrapping
+    /// A struct for wrapping CapsuleCollider and NavMeshAgent information
     /// </summary>
-    public TNavMeshAgentType agentType = new TNavMeshAgentType{
-        speed = 15f,
-        angularSpeed = 120f,
-        acceleration = .3f,
-        stoppingDistance = 3f,
-        autoBraking = true,
-        radius = 2f,
-        height = 5f
-    };
+    public float speed = 15f;
+    public float angularSpeed = 120f;
+    public float acceleration = .3f;
+    public float stoppingDistance = 3f;
+    public bool autoBraking = true;
+    public float radius = 2f;
+    public float height = 5f;
 
     /// <summary>
     /// The RigidBody.mass of this mech
@@ -81,4 +79,11 @@ public static class SelectionAlg
     {
         return mechs.OrderByDescending((mech) => (selector.transform.position - mech.transform.position).sqrMagnitude).First();
     }
+}
+
+public enum SelectionAlgorithType
+{
+    LowestHealth,
+    Closest,
+    HighestHealth
 }

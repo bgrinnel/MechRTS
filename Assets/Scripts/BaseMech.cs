@@ -28,7 +28,7 @@ public abstract class BaseMech : MonoBehaviour
         InRangePartial,
         /// <summary>
         /// The target is closer than MechBehaviour.engageDistanceFull
-        /// </summary>
+        /// </summary>s
         InRangeFull,
         /// <summary>
         /// The target is closer than MechBehaviour.engageDistanceRetreat
@@ -43,6 +43,8 @@ public abstract class BaseMech : MonoBehaviour
     // Private and protected fields
     [SerializeField] private MechType _type;
     [SerializeField] private Vector3[] _patrol = System.Array.Empty<Vector3>();
+    [SerializeField] protected List<Vector3> waypoints;
+
     private float _scaledRadius;
     private float _scaledHalfHeight;
 
@@ -69,8 +71,6 @@ public abstract class BaseMech : MonoBehaviour
     private float _currentStateDurationSeconds;
     private TState _previousState;
     private bool _isMoving;
-    private BaseMech _target;
-    private bool _playerSetTarget;
     private bool _isGainingAggro;
     private float _timeTillAggro; 
     private float _timeGainingAggro;
@@ -78,16 +78,15 @@ public abstract class BaseMech : MonoBehaviour
     // saved component references
     private CombatBehaviour _combatBehaviour;
     private NavMeshAgent _navMeshAgent;
-    private CapsuleCollider _capsuleCollider;
+    protected CapsuleCollider capsuleCollider;
     private ParticleSystem _onDeathSmoke;
-    private MeshRenderer _selectionPulse;
-    private MeshRenderer _targetPulse;
 
 
     /// <summary>
     /// the current index in _patrol the mech should move towards
     /// </summary>
     protected int patrolIdx;
+    protected BaseMech currentTarget;
     
         
     /********************
@@ -108,12 +107,17 @@ public abstract class BaseMech : MonoBehaviour
     /// <summary>
     /// The current MechBehavior enemy this Mech is chasing 
     /// </summary>
-    public BaseMech CurrentTarget => _target;
+    public BaseMech CurrentTarget => currentTarget;
+
+    /// <summary>
+    /// The current waypoints set to this Mech
+    /// </summary>
+    public Vector3[] Waypoints => waypoints.ToArray();
 
     /// <summary>
     /// Whether the Mech has a viable Target (doesn't mean that Target is non-null)
     /// </summary>
-    public bool HasViableTarget => _target != null || _timeGainingAggro >= _timeTillAggro;
+    public bool HasViableTarget => currentTarget != null || _timeGainingAggro >= _timeTillAggro;
 
     /// <summary>
     /// The NavMeshAgent component of this mech
@@ -128,7 +132,7 @@ public abstract class BaseMech : MonoBehaviour
     /// <summary>
     /// Getter for FSM current state, refer to the public enum MechBehaviour.EState for State descriptions
     /// </summary>
-    public TState State => _currentState;
+    public TState CurrentState => _currentState;
 
     /// <summary>
     /// returns the MechType this MechBehaviour is instantiated from (read-only)
@@ -143,11 +147,6 @@ public abstract class BaseMech : MonoBehaviour
     /// Whether this mech has a patrol path (read-only)
     /// </summary>
     public bool IsPlayerMech => _isPlayer;
-
-    /// <summary>
-    /// Returns whether this mech is Selected by the Player
-    /// </summary>
-    public bool IsSelected => _selectionPulse == null ? false : _selectionPulse.enabled; 
 
     /********************
     *     EVENTS       *
@@ -186,26 +185,28 @@ public abstract class BaseMech : MonoBehaviour
     // Methods and functions
     private void Awake()
     {   
+        waypoints = new();
         MechAwake(out bool is_player);
         _isPlayer = is_player;
-
         _onDeathSmoke = GetComponentInChildren<ParticleSystem>();
 
         _navMeshAgent = GetComponent<NavMeshAgent>();
-        _navMeshAgent.speed = _type.agentType.speed;
-        _navMeshAgent.angularSpeed = _type.agentType.angularSpeed;
-        _navMeshAgent.acceleration = _type.agentType.acceleration;
-        _navMeshAgent.stoppingDistance = _type.agentType.stoppingDistance;
-        _navMeshAgent.autoBraking = _type.agentType.autoBraking;
-        _navMeshAgent.radius = _type.agentType.radius;
-        _navMeshAgent.height = _type.agentType.height;
-        _navMeshAgent.height = _type.agentType.height / 1.95f;
+        _navMeshAgent.speed = _type.speed;
+        _navMeshAgent.angularSpeed = _type.angularSpeed;
+        _navMeshAgent.acceleration = _type.acceleration;
+        _navMeshAgent.stoppingDistance = _type.stoppingDistance;
+        _navMeshAgent.autoBraking = _type.autoBraking;
+        _navMeshAgent.radius = _type.radius * .95f;
+        _navMeshAgent.height = _type.height;
+        _navMeshAgent.height = _type.height / 2f;
         _navMeshAgent.autoTraverseOffMeshLink = true;
-        _navMeshAgent.agentTypeID = -1372625422;                // I initially printed the mech id to find its value
-
-        _capsuleCollider = GetComponent<CapsuleCollider>();
-        _capsuleCollider.radius = _type.agentType.radius;
-        _capsuleCollider.height = _type.agentType.height;
+        _navMeshAgent.agentTypeID = -1372625422;    // can be found in the baked nav mesh surface at the bottom of the editor window
+        _navMeshAgent.obstacleAvoidanceType = ObstacleAvoidanceType.HighQualityObstacleAvoidance;
+        _navMeshAgent.autoRepath = true;
+        
+        capsuleCollider = GetComponent<CapsuleCollider>();
+        capsuleCollider.radius = _type.radius;
+        capsuleCollider.height = _type.height;
         var rigidbody = GetComponent<Rigidbody>();
         rigidbody.mass = _type.mass;
         rigidbody.drag = _type.drag;
@@ -232,13 +233,9 @@ public abstract class BaseMech : MonoBehaviour
         }
         _engageDistanceRetreat = _engageDistanceFull / 2f;
         SetState( HasPatrol ? TState.Patroling : TState.Idle);
-        _selectionPulse = _isPlayer ? transform.GetChild(0).GetComponent<MeshRenderer>() : null;
-        _targetPulse = _isPlayer ? null : transform.GetChild(0).GetComponent<MeshRenderer>();
-        SetIsSelected(false);
-        SetIsTargeted(false);
         _timeTillAggro = 5f;
-        _scaledRadius = _type.agentType.radius * Mathf.Max(transform.localScale.x, transform.localScale.z); // take the largest to be safe
-        _scaledHalfHeight = _type.agentType.height * transform.localScale.y / 2f - _scaledRadius;
+        _scaledRadius = _type.radius * Mathf.Max(transform.localScale.x, transform.localScale.z); // take the largest to be safe
+        _scaledHalfHeight = _type.height * transform.localScale.y / 2f - _scaledRadius;
     }
     
     /// <summary>
@@ -248,21 +245,11 @@ public abstract class BaseMech : MonoBehaviour
 
     private void Update()
     {
-		/* INTENDED DESIGN?
-		
-		Idle 						-> attack any unit that comes into range but doesn't follow
-
-		SetWaypoint, MB1 command	->	move to position, don't fire till in position	
-
-		Chase,  MB1 on Enemy		-> follow enemy till killed, then stop moving
-
-		SetWaypoint, MB1 + Hotkey 	-> move to position, fire on-way as needed 
-		*/
         _currentStateDurationSeconds += Time.deltaTime;
         if (_currentState == TState.Dead) return;
         
-        if (_isGainingAggro && _target == null) _timeGainingAggro += Time.deltaTime;
-        else if (!_isGainingAggro && _target == null) _timeGainingAggro -= Time.deltaTime;
+        if (_isGainingAggro && currentTarget == null) _timeGainingAggro += Time.deltaTime;
+        else if (!_isGainingAggro && currentTarget == null) _timeGainingAggro -= Time.deltaTime;
 
 
         var temp_target = FindBestVisibleTarget();
@@ -411,19 +398,8 @@ public abstract class BaseMech : MonoBehaviour
         else return null;
     }
 
-    protected void SetTarget(BaseMech target)
-    {
-        if (_currentState == TState.Dead) return;
-        if (IsSelected && _target != null) _target.SetIsTargeted(false);
-        _target = target;
-        if (_target != null) 
-        {
-            SetState(TState.Chasing);
-            if (IsSelected) _target.SetIsTargeted(true);
-            SetNavDestination(_target);
-            _target.GetComponent<CombatBehaviour>().death += OnTargetDeath;
-        }
-    }
+    protected abstract void SetTarget(BaseMech target);
+
 
     /// <summary>
     /// Internal setter for FSM current state
@@ -431,7 +407,7 @@ public abstract class BaseMech : MonoBehaviour
     protected void SetState(TState newState)
     {
         if (newState == _currentState) return;
-        Debug.Log($"\"{gameObject.name}\" is now \"{newState}\"");
+        // Debug.Log($"\"{gameObject.name}\" is now \"{newState}\"");
         _previousState = _currentState;
         _currentState = newState;
         StateChanged?.Invoke(_currentState, _previousState, _currentStateDurationSeconds);
@@ -441,27 +417,39 @@ public abstract class BaseMech : MonoBehaviour
     protected void SetIsUsingNavAgent(bool isUsingNavAgent)
     {
         if (isUsingNavAgent == _navMeshAgent.enabled) return;
-        if (!isUsingNavAgent) SetNavDestination(transform.position);
+        if (!isUsingNavAgent) SetDestination(transform.position, true);
         _navMeshAgent.enabled = isUsingNavAgent;
     }
     
     /// <summary>
     /// for internal setting only, if you're the player use a "Command" method
     /// </summary>
-    protected void SetNavDestination(Vector3 newDest)
+    protected void SetDestination(Vector3 newDest, bool overrideWaypoints)
     {
         if (_currentState == TState.Dead) return;
         if (!_navMeshAgent.enabled) SetIsUsingNavAgent(true);
+        if (overrideWaypoints) 
+        {   
+            waypoints.Clear();
+            waypoints.Add(newDest);
+        }
         _navMeshAgent.destination = newDest;
+    }
+
+    protected void AppendWaypoint(Vector3 newWaypoint)
+    {
+        if (_currentState == TState.Dead) return;
+        if (!_navMeshAgent.enabled) SetIsUsingNavAgent(true);
+        waypoints.Add(newWaypoint);
     }
 
     /// <summary>
     /// Set's the destination as the position of the other mech while avoiding collision
     /// </summary>
-    protected void SetNavDestination(BaseMech targetDestination)
+    protected void SetDestination(BaseMech targetDestination)
     {
         var direction_to_self = (transform.position - targetDestination.transform.position).normalized;
-        SetNavDestination(targetDestination.transform.position + direction_to_self * (_scaledRadius + targetDestination._scaledRadius));
+        SetDestination(targetDestination.transform.position + direction_to_self * (_scaledRadius + targetDestination._scaledRadius), true);
     }
 
     /// <summary>
@@ -470,25 +458,6 @@ public abstract class BaseMech : MonoBehaviour
     protected void FireAt(Weapon weapon, BaseMech target)
     {
         if (weapon.Fire(target.gameObject)) WeaponFired?.Invoke();
-    }
-
-    /// <summary>
-    /// A player command for setting a waypoint
-    /// </summary>
-    public void CommandSetWaypoint(Vector3 waypoint){
-        SetState(TState.FollowingWaypoint);
-        if (_target != null) SetTarget(null);
-        SetNavDestination(waypoint);
-    }
-
-    /// <summary>
-    /// A command for setting the current target (acts as an override, the mech will not chase other mechs even if they are a better target)
-    /// </summary>
-    public void CommandSetTarget(BaseMech target)
-    {
-        if (_currentState == TState.Dead) return;
-        SetTarget(target);
-        _playerSetTarget = true;
     }
 
     /// <summary>
@@ -533,53 +502,42 @@ public abstract class BaseMech : MonoBehaviour
     /// Whether this mech is at its nav destination
     /// </summary>
     public bool HasReachedDestination(){
-        return _navMeshAgent.remainingDistance <= _type.agentType.radius + .8f;
+        if (_navMeshAgent.isActiveAndEnabled) 
+        {
+            return _navMeshAgent.remainingDistance <= _type.radius + .8f;
+        }
+        return false;
     }
 
     /// <summary>
     /// A delegate for the CombatBehaviour.healthModified event
     /// Already called internally, you don't need to call it if damage is done through CombatBehaviour
     /// </summary>
-    public void OnDamaged(TPropertyContainer health, TCombatContext context)
+    public virtual void OnDamaged(TPropertyContainer health, TCombatContext context)
     {
-        if (context.damage.current <= 0f) return;
-        if (context.instigator == null) return;
-        if (_target == null && _currentState != (TState.Chasing | TState.Fighting | TState.FollowingWaypoint | TState.AwaitingWaypoint))
-        {
-            SetTarget(context.instigator.GetComponent<BaseMech>());
-        }
     }
 
     /// <summary>
     /// A delegate for the CombatBehaviour.defeatedAgent event
     /// Already called internally, you don't need to call it if damage is done through CombatBehaviour
     /// </summary>
-    public void OnDefeatedAgent(CombatBehaviour behaviour, TCombatContext context)
+    public virtual void OnDefeatedAgent(CombatBehaviour behaviour, TCombatContext context)
     {
-        var mech = behaviour.GetComponent<BaseMech>();
-        if (mech != null && mech == _target)
-        {
-            _playerSetTarget = false;
-            _target = null;
-        }
     }
 
     /// <summary>
     /// A delegate for the CombatBehaviour.death event
     /// Already called internally, you don't need to call it if damage is done through CombatBehaviour
     /// </summary>
-    public void OnDeath(TCombatContext context)
+    public virtual void OnDeath(TCombatContext context)
     {
         _onDeathSmoke.Play(true); // TODO: I want this out of here but that may just be my brain - Jeff
         SetState(TState.Dead);
-        SetIsSelected(false);
-        SetIsTargeted(false);
     }
 
-    public void OnTargetDeath(TCombatContext context)
+    public virtual void OnTargetDeath(TCombatContext context)
     {
         SetTarget(null);
-        _playerSetTarget = false;
     }
 
     /// <summary>
@@ -588,34 +546,6 @@ public abstract class BaseMech : MonoBehaviour
     public void HitMech(BaseMech mech, float damage)
     {
         CombatBehaviour.CombatEvent(_combatBehaviour, mech._combatBehaviour, TCombatContext.BasicAttack(damage));
-    }
-
-    /// <summary>
-    /// Set whether this mech is Selected by the player
-    /// </summary>
-    public void SetIsSelected(bool isSelected)
-    {
-        if (_currentState == TState.Dead) return;
-        if (_selectionPulse == null) return;
-        _selectionPulse.enabled = isSelected;
-        if (_target != null) _target.SetIsTargeted(isSelected);
-        if (!isSelected) 
-        {
-            if (_currentState == TState.AwaitingWaypoint) SetState(TState.Idle);
-        }
-        if (isSelected) 
-        {
-            if (_currentState == TState.Idle) SetState(TState.AwaitingWaypoint);
-        }
-    } 
-
-    /// <summary>
-    /// Set whether this 
-    /// </summary>
-    public void SetIsTargeted(bool isTargeted)
-    {
-        if (_targetPulse == null) return;
-        _targetPulse.enabled = isTargeted;
     }
 }
 

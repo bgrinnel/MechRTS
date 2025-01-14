@@ -1,10 +1,12 @@
 using UnityEngine;
-using UnityEngine.UI;
 using System.Collections.Generic;
+using UnityEngine.AI;
 using System.Linq;
 
+[ExecuteInEditMode]
 public class RTSController : MonoBehaviour
 {
+    public static RTSController Singleton;
     [SerializeField] private RectTransform selectionBox;
     [SerializeField] private Vector3 screenPos;
     [SerializeField] private Vector3 worldPos;
@@ -13,10 +15,13 @@ public class RTSController : MonoBehaviour
     [SerializeField] private LayerMask enemyLayerMask;
     [SerializeField] private float clickThreshold = 20f; // To distinguish between click and drag
 
-    private Vector2 startPos;
+    private Vector2 leftMBStartPos;
+    private Vector2 rightMBStartPos;
     [SerializeField] CameraController camState;
 
-    private bool isDragging = false;
+    private bool isLeftMBDragging = false;
+    private bool isRightMBDragging = false;
+
     [SerializeField] private GameObject moveTargetEffect;
 
 
@@ -33,6 +38,18 @@ public class RTSController : MonoBehaviour
     private GameObject settingsUI;
     private bool SettingsMenu = false;
 
+    private void OnEnable()
+    {
+        if (_playerUnits == null) _playerUnits = new();
+        if (Singleton == null) Singleton = this;
+    }
+
+    private void OnDisable()
+    {
+        if (Singleton != null) Singleton = null;
+        // if (_playerUnits != null) _playerUnits.Clear();
+    }
+
     private void Awake()
     {
         if (_playerUnits == null) _playerUnits = new();
@@ -42,6 +59,7 @@ public class RTSController : MonoBehaviour
             unitGroups[i] = new List<GameObject>();
         }
     }
+
     private void Start()
     {
         selectionBox.gameObject.SetActive(false);
@@ -63,37 +81,52 @@ public class RTSController : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             // CheckButtonPressed
-            startPos = Input.mousePosition;
-            isDragging = false;
+            leftMBStartPos = Input.mousePosition;
+            isLeftMBDragging = false;
             //selectionBox.gameObject.SetActive(false); // Hide Selection box initially
+        }
+        if (Input.GetMouseButtonDown(1))
+        {
+            rightMBStartPos = Input.mousePosition;
+            isRightMBDragging = false;
+            Debug.Log("draggingMB1 set false1");
         }
 
         if (Input.GetMouseButton(0))
         {
             // Check if dragging or clicking
-            if (Vector2.Distance(startPos, Input.mousePosition) > clickThreshold)
+            if (Vector2.Distance(leftMBStartPos, Input.mousePosition) > clickThreshold)
             {
-                isDragging = true;
-                //selectionBox.gameObject.SetActive(true);
-                UpdateSelectionBox(startPos, Input.mousePosition);
+                isLeftMBDragging = true;
+                UpdateSelectionBox(leftMBStartPos, Input.mousePosition);
             }
         }
+        if (Input.GetMouseButton(1))
+        {
+            // Check if dragging or clicking
+            if (Vector2.Distance(rightMBStartPos, Input.mousePosition) > clickThreshold)
+            {
+                isRightMBDragging = true;
+                Debug.Log("draggingMB1 set true");
+            }
+        }
+
         //left mouse click
         if (Input.GetMouseButtonUp(0) )
         {
-            if (isDragging)
+            if (isLeftMBDragging)
             {
                 // Finish drag selection
                 //selectionBox.gameObject.SetActive(false);
                 SelectUnitsWithinBox();
 				selectionBox.gameObject.SetActive(false);
-                isDragging = false;
             }
             else
             {
                 // Perform single click selection
                 SelectSingleUnit();
             }
+            isLeftMBDragging = false;
         }
         
         //right mouse click
@@ -104,10 +137,33 @@ public class RTSController : MonoBehaviour
             if(Physics.Raycast(ray,  out RaycastHit hitData2, 1000, enemyLayerMask)){
                 var mech = hitData2.collider.gameObject.GetComponent<BaseMech>();
                 foreach (var unit in _selectedUnits){
-                    unit.GetComponent<BaseMech>().CommandSetTarget(mech);
+                    unit.GetComponent<PlayerMech>().CommandSetTarget(mech);
                 }
             }
             else RightMouseClick();
+        }
+        else if (Input.GetMouseButton(1) && _selectedUnits.Count == 1)
+        {
+            if (isRightMBDragging && GetWorldPosition(out Vector3 world_pos))
+            {
+                foreach (var unit in _selectedUnits)
+                {
+                    var player_mech = unit.GetComponent<PlayerMech>();
+                    var waypoints = player_mech.Waypoints;
+                    if (Vector3.Distance(world_pos, waypoints[waypoints.Length-1]) > 4f)
+                    {
+                        player_mech.CommandAppendWaypoint(world_pos);
+                        GameObject splashEffect = Instantiate(moveTargetEffect, world_pos, transform.rotation);
+                        Destroy(splashEffect, 0.5f);
+                    }
+                }
+            }
+        }
+
+        if (Input.GetMouseButtonUp(1))
+        {
+            isRightMBDragging = false;
+            Debug.Log("draggingMB1 set false2");
         }
     }
 
@@ -123,48 +179,80 @@ public class RTSController : MonoBehaviour
         Vector2 size = new Vector2(Mathf.Abs(start.x - end.x), Mathf.Abs(start.y - end.y));
         
 		selectionBox.sizeDelta = size;
-		selectionBox.anchoredPosition = startPos + new Vector2((end.x - start.x)/2, (end.y - start.y)/2);
+		selectionBox.anchoredPosition = leftMBStartPos + new Vector2((end.x - start.x)/2, (end.y - start.y)/2);
     }
+    
+    private bool box_made = false;
+    private Vector3 rect_prism_center;
+    private Vector3 rect_prism_size;
 
     void SelectUnitsWithinBox()
     {
-		/*
-        Vector3 start = Camera.main.ScreenToWorldPoint(new Vector3(startPos.x, startPos.y, Camera.main.transform.position.z)) * -1;
-        Vector3 end = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.transform.position.z)) * -1;
-       
-       
+        const float rect_prism_height = 30f;
 
-        Vector3 center = end -start;
-
-
-        Vector3 size = new Vector3(end.x - start.x, end.y - start.y,  Camera.main.nearClipPlane + 1);
-       //Debug.Log("size " + size);
-        var unitsBoxed = Physics.OverlapBox(center,size , Quaternion.identity, unitLayerMask);
-        //var unitsBoxed = Physics2D.OverlapAreaAll(start, end);
-        if (!_shiftPressed) { DeSelectAll(); }
-        foreach (var unit in _playerUnits)
+        Vector3? get_projection(Ray ray)
         {
-            if (!_selectedUnits.Contains(unit.gameObject))
-            {
-                _selectedUnits.Add(unit.gameObject);
-                unit.GetComponent<MechBehavior>().SetIsSelected(true);
-            }
+            Vector3 origin = ray.origin;
+            Vector3 direction = ray.direction;
+            if (Mathf.Approximately(direction.y, 0f)) return null; // No intersection
+            float t = -origin.y / direction.y;
+            if (t < 0)return null; // Intersection is behind the ray origin
+            return origin + t * direction;
         }
-		*/
+
 		Vector2 min = selectionBox.anchoredPosition - (selectionBox.sizeDelta / 2);
 		Vector2 max = selectionBox.anchoredPosition + (selectionBox.sizeDelta / 2);
-		
+        var camera = Camera.main;
+        // Vector2 center = (max - min) / 2f;
+
+        Vector3? result1 = get_projection(camera.ScreenPointToRay(min));
+        Vector3? result2 = get_projection(camera.ScreenPointToRay(max));
+        if (result1 == null || result2 == null) return;
+        Vector3 min_world = (Vector3)result1;
+        Vector3 max_world = (Vector3)result2;
+
+
+        rect_prism_center = (min_world + max_world) / 2f;
+        rect_prism_size = max_world - min_world;
+        rect_prism_size.y = rect_prism_height;
+
+        Debug.Log($"center:'{rect_prism_center}' | size:'{rect_prism_size}'");
+        box_made = true;
+
+		var player_colliders = Physics.OverlapBox(rect_prism_center, rect_prism_size/2f, Quaternion.identity, unitLayerMask);
+
 		if (!_shiftPressed) { DeSelectAll(); }
-		
-		foreach(var unit in _playerUnits)
-		{
-			Vector3 screenPos = Camera.main.WorldToScreenPoint(unit.transform.position);
-        
-			if(screenPos.x > min.x && screenPos.x < max.x && screenPos.y > min.y && screenPos.y < max.y)
-			{
-				Select(unit);
-			}
-		}
+        // foreach (var unit in _playerUnits)
+        // {
+        //     var mech = unit.GetComponent<PlayerMech>();
+        //     var screen_space = Camera.main.WorldToScreenPoint(unit.transform.position);
+        //     var forward_screen_space = Camera.main.WorldToScreenPoint(unit.transform.position + unit.transform.forward * mech.ScaledRadius);
+        //     Vector2 position = new (screen_space.x, screen_space.y);
+        //     var to_center = center - position;
+        //     float distance = to_center.magnitude;
+        //     Vector2 direction = to_center.normalized;
+        //     Vector3 projected_pos = position + direction * Mathf.Min(distance, Vector3.Distance(screen_space, forward_screen_space));
+        //     if(projected_pos.x > min.x && projected_pos.x < max.x && projected_pos.y > min.y && projected_pos.y < max.y)
+		// 	{
+		// 		Select(unit);
+		// 	}
+        // }
+        foreach (var collider in player_colliders)
+        {
+            Debug.Log($"Collision with '{collider.name}'");
+            if (_playerUnits.Contains(collider.gameObject))
+            {
+                Select(collider.gameObject);
+            }
+        }
+
+    }
+
+    void OnDrawGizmos()
+    {
+        if (!box_made) return;
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireCube(rect_prism_center, rect_prism_size);
     }
 
     void SelectSingleUnit()
@@ -196,12 +284,27 @@ public class RTSController : MonoBehaviour
         */
     }
 
-    void RightMouseClick()
+    /// <summary>
+    /// Fetches a Vector3 world position from the Input.mousePosition, returns true if it found one false otherwise.
+    /// </summary>
+    private bool GetWorldPosition(out Vector3 worldPos)
     {
+        worldPos = Vector3.zero;
         screenPos = Input.mousePosition;
         Ray ray = Camera.main.ScreenPointToRay(screenPos);
-        if(Physics.Raycast(ray,  out RaycastHit hitData, 1000, backgroundLayerMask)){
+        if(Physics.Raycast(ray,  out RaycastHit hitData, 1000, backgroundLayerMask))
+        {
+            if (!hitData.collider.gameObject.CompareTag("Walkable")) return false;
             worldPos = hitData.point;
+            return true;
+        }
+        return false;
+    }
+
+    private void RightMouseClick()
+    {
+        if (GetWorldPosition(out worldPos))
+        {
             GameObject splashEffect = Instantiate(moveTargetEffect, worldPos, transform.rotation);
             Destroy(splashEffect, 0.5f);
 
@@ -209,8 +312,9 @@ public class RTSController : MonoBehaviour
             Vector3 center = Vector3.zero; 
             foreach (var unit in _selectedUnits) center += unit.transform.position;
             center /= num_selected;
-            foreach (var unit in _selectedUnits){
-                BaseMech mech = unit.GetComponent<BaseMech>();
+            foreach (var unit in _selectedUnits)
+            {
+                var mech = unit.GetComponent<PlayerMech>();
                 if (num_selected == 1) mech.CommandSetWaypoint(worldPos);
                 else
                 {
@@ -219,14 +323,13 @@ public class RTSController : MonoBehaviour
                 }
             }
         }
-        
     }
 
     
     public void Select(GameObject unit)
     {
         _selectedUnits.Add(unit);
-        unit.GetComponent<BaseMech>().SetIsSelected(true);
+        unit.GetComponent<PlayerMech>().SetIsSelected(true);
     }
 
     public List<GameObject> Selected()
@@ -239,13 +342,13 @@ public class RTSController : MonoBehaviour
         if (_selectedUnits.Contains(unit))
         {
             _selectedUnits.Remove(unit);
-            unit.GetComponent<BaseMech>().SetIsSelected(false);
+            unit.GetComponent<PlayerMech>().SetIsSelected(false);
         }
     }
 
     public void DeSelectAll()
     {
-        foreach (var unit in _selectedUnits) unit.GetComponent<BaseMech>().SetIsSelected(false);
+        foreach (var unit in _selectedUnits) unit.GetComponent<PlayerMech>().SetIsSelected(false);
         _selectedUnits.Clear();
     }
 
@@ -287,6 +390,20 @@ public class RTSController : MonoBehaviour
         
     }
     
+    public void RegisterPlayerMech(PlayerMech playerMech)
+    {
+        var playermech_gameobject = playerMech.gameObject;
+        if (_playerUnits.Contains(playermech_gameobject)) return;
+        _playerUnits.Add(playermech_gameobject);
+    }
+    
+    public void UnregisterPlayerMech(PlayerMech playerMech)
+    {
+        var playermech_gameobject = playerMech.gameObject;
+        if (!_playerUnits.Contains(playermech_gameobject)) return;
+        _playerUnits.Remove(playermech_gameobject);
+    }
+
     public void ExitButton()
     {
         Application.Quit();

@@ -3,9 +3,12 @@ using System.Linq;
 
 public class EnemyMech : BaseMech
 {
+    private MeshRenderer _targetPulse;
     protected override void MechAwake(out bool isPlayer)
     {
         isPlayer = false;
+        _targetPulse = transform.GetChild(0).GetComponent<MeshRenderer>();
+        SetIsTargeted(false);
     }
 
     protected override void MechUpdate(TState state, BaseMech tempTarget, BaseMech heardTarget)
@@ -31,12 +34,12 @@ public class EnemyMech : BaseMech
                     {
                         var closest_patrol_point = Patrol.OrderBy((pos) => (transform.position - pos).sqrMagnitude).First();
                         patrolIdx = Patrol.FindIndex((patrol_point) => patrol_point == closest_patrol_point);
-                        SetNavDestination(closest_patrol_point);
+                        SetDestination(closest_patrol_point, true);
                         SetState(TState.Patroling);
                     }
                     else if (HasReachedDestination())
                     { 
-                        SetNavDestination(Patrol[++patrolIdx % Patrol.Count]);
+                        SetDestination(Patrol[++patrolIdx % Patrol.Count], true);
                     }
                     break;
                 }
@@ -46,7 +49,7 @@ public class EnemyMech : BaseMech
                 if (CurrentTarget == null && tempTarget == null) 
                 {
                     SetState(TState.Idle);
-                    SetNavDestination(transform.position);
+                    SetDestination(transform.position, true);
                     break;
                 }
 
@@ -57,27 +60,15 @@ public class EnemyMech : BaseMech
                 engagement = EngageTarget(CurrentTarget);
                 if (engagement == EEngagement.InRangeFull || engagement == EEngagement.TooClose)
                 {
-                    SetNavDestination(transform.position);
+                    SetDestination(transform.position, true);
                 }
                 else if (CurrentTarget != null) // check if we killed the target after engagement
                 {
-                    SetNavDestination(CurrentTarget);
+                    SetDestination(CurrentTarget);
                 }
                 break;
 
             case TState.Fighting:
-                // if (CurrentTarget == null)
-                // {
-                //     SetState(TState.Idle);
-                //     break;
-                // } 
-                // engagement = EngageTarget(CurrentTarget);
-                // if (engagement == EEngagement.InRangePartial || engagement == EEngagement.OutOfRange)
-                // {
-                //     if (CurrentTarget == null) break;
-                //     SetState(TState.Chasing);
-                //     SetNavDestination(CurrentTarget);
-                // }
                 break;
 
             case TState.Retreating:
@@ -88,5 +79,43 @@ public class EnemyMech : BaseMech
             case TState.AwaitingWaypoint:
                 break; 
         }
+    }
+
+    protected override void SetTarget(BaseMech target)
+    {
+        if (CurrentState == TState.Dead) return;
+        currentTarget = target;
+        if (target != null) 
+        {
+            SetState(TState.Chasing);
+            SetDestination(target);
+            target.CombatBehviour.death += OnTargetDeath;
+        }
+    }
+
+    public override void OnDamaged(TPropertyContainer health, TCombatContext context)
+    {
+        base.OnDamaged(health, context);
+        if (context.damage.current <= 0f) return;
+        if (context.instigator == null) return;
+        if (CurrentTarget == null)
+        {
+            SetTarget(context.instigator.GetComponent<BaseMech>());
+        }
+    }
+
+    public override void OnDeath(TCombatContext context)
+    {
+        base.OnDeath(context);
+        SetIsTargeted(false);
+    }
+
+    /// <summary>
+    /// Set whether this 
+    /// </summary>
+    public void SetIsTargeted(bool isTargeted)
+    {
+        if (_targetPulse == null) return;
+        _targetPulse.enabled = isTargeted;
     }
 }

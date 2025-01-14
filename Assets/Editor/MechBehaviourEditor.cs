@@ -147,19 +147,19 @@ public class MechBehaviourEditor : Editor
             _serializedParent_layer.intValue = LayerMask.NameToLayer(mech.IsPlayerMech ? "Player" : "Enemy");
             _serializedParent_tag.stringValue = "Mech"; 
 
-            _serializedAgent_speed.floatValue = mech_type.agentType.speed;
-            _serializedAgent_angularSpeed.floatValue = mech_type.agentType.angularSpeed;
-            _serializedAgent_acceleration.floatValue = mech_type.agentType.acceleration;
-            _serializedAgent_stoppingDistance.floatValue = mech_type.agentType.stoppingDistance;
-            _serializedAgent_autoBraking.boolValue = mech_type.agentType.autoBraking;
-            _serializedAgent_radius.floatValue = mech_type.agentType.radius;
-            _serializedAgent_height.floatValue = mech_type.agentType.height;
-            _serializedAgent_baseOffset.floatValue = mech_type.agentType.height / 1.95f;
+            _serializedAgent_speed.floatValue = mech_type.speed;
+            _serializedAgent_angularSpeed.floatValue = mech_type.angularSpeed;
+            _serializedAgent_acceleration.floatValue = mech_type.acceleration;
+            _serializedAgent_stoppingDistance.floatValue = mech_type.stoppingDistance;
+            _serializedAgent_autoBraking.boolValue = mech_type.autoBraking;
+            _serializedAgent_radius.floatValue = mech_type.radius;
+            _serializedAgent_height.floatValue = mech_type.height;
+            _serializedAgent_baseOffset.floatValue = mech_type.height / 1.95f;
             _serializedAgent_autoTraverseOffMeshLink.boolValue = true;
             _serializedAgent_agentTypeID.intValue = -1372625422;                // I initially printed the mech id to find its value
             // Debug.Log($"NavMeshAgent typeId = {nav_type_id}");
-            _serializedCollider_radius.floatValue = mech_type.agentType.radius;
-            _serializedCollider_height.floatValue = mech_type.agentType.height;
+            _serializedCollider_radius.floatValue = mech_type.radius;
+            _serializedCollider_height.floatValue = mech_type.height;
 
             _serializedRigidBody_mass.floatValue = mech_type.mass;
             _serializedRigidBody_drag.floatValue = mech_type.drag;

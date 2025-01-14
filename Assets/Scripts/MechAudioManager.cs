@@ -48,7 +48,7 @@ public class MechAudioManager : MonoBehaviour
 
     private void Update()
     {
-        if (_mechBehaviour.State == TState.Dead) return;
+        if (_mechBehaviour.CurrentState == TState.Dead) return;
         if (_mechBehaviour.IsMoving) _secondsMoving += Time.deltaTime;
         if (_secondsMoving >= _secondsBetweenFootfalls)
         {

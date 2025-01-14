@@ -13,14 +13,13 @@ MonoBehaviour:
   m_Name: DemoPlayer
   m_EditorClassIdentifier: 
   maxHealth: 700
-  agentType:
-    speed: 16
-    angularSpeed: 120
-    acceleration: 20
-    stoppingDistance: 2
-    autoBraking: 1
-    radius: 0.5
-    height: 2
+  speed: 22
+  angularSpeed: 120
+  acceleration: 0.3
+  stoppingDistance: 3
+  autoBraking: 1
+  radius: 2
+  height: 5
   mass: 300
   drag: 10
   angularDrag: 20
