@@ -65,6 +65,10 @@ public class MechType : ScriptableObject
     public WeaponScriptable[] weapons;
 }
 
+/// <summary>
+/// Where all methods that are to be used as <see cref="MechType.SelectionAlgorithm"/> delegates should be defined.
+/// Make sure that all <see cref="SelectionAlgorithType"/> numeration names match all <see cref="SelectionAlg"/> method names
+/// </summary>
 public static class SelectionAlg
 {
     public static BaseMech LowestHealth(BaseMech selector, params BaseMech[] mechs)
@@ -81,6 +85,10 @@ public static class SelectionAlg
     }
 }
 
+/// <summary>
+/// Enumerations for exposing <see cref="MechType.SelectionAlgorithm"/> delegates in the Editor.
+/// Make sure that all <see cref="SelectionAlgorithType"/> numeration names match all <see cref="SelectionAlg"/> method names
+/// </summary>
 public enum SelectionAlgorithType
 {
     LowestHealth,
