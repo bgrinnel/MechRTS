@@ -25,8 +25,24 @@ public class MechTypeEditor : Editor
     private SerializedProperty _serialiedHearingRange;
     private SerializedProperty _serialiedSelectionAlgorithm;
     private SerializedProperty _serialiedWeaponArray;
-
+    private SerializedProperty _serializedhitRateReductionOverSpeed;
+    private SerializedProperty _serializeddamageReductionOverSpeed;
+    private SerializedProperty _serializedcritRateReductionOverSpeed;
+    private SerializedProperty _serializedfrontFlankHitRateAddOverDistance;
+    private SerializedProperty _serializedfrontFlankCritRateAddOverDistance;
+    private SerializedProperty _serializedleftFlankHitRateAddOverDistance;
+    private SerializedProperty _serializedleftFlankCritRateAddOverDistance;
+    private SerializedProperty _serializedrightFlankHitRateAddOverDistance;
+    private SerializedProperty _serializedrightFlankCritRateAddOverDistance;
+    private SerializedProperty _serializedrearFlankHitRateAddOverDistance;
+    private SerializedProperty _serializedrearFlankCritRateAddOverDistance;
     private bool _isShowingAgentProperties;
+    private bool _isShowingCurves;
+    private bool _isShowingSpeedCurves;
+    private bool _isShowingFrontFlankCurves;
+    private bool _isShowingLeftFlankCurves;
+    private bool _isShowingRightFlankCurves;
+    private bool _isShowingRearFlankCurves;
     void OnEnable()
     {
         var mech_type = (MechType)target;
@@ -58,6 +74,18 @@ public class MechTypeEditor : Editor
         _serialiedHearingRange = serializedObject.FindProperty("hearingRange");
         _serialiedSelectionAlgorithm = serializedObject.FindProperty("selectionAlg");
         _serialiedWeaponArray = serializedObject.FindProperty("weapons");
+
+        _serializedhitRateReductionOverSpeed = serializedObject.FindProperty("hitRateReductionOverSpeed");
+        _serializeddamageReductionOverSpeed = serializedObject.FindProperty("damageReductionOverSpeed");
+        _serializedcritRateReductionOverSpeed = serializedObject.FindProperty("critRateReductionOverSpeed");
+        _serializedfrontFlankHitRateAddOverDistance = serializedObject.FindProperty("frontFlankHitRateAddOverDistance");
+        _serializedfrontFlankCritRateAddOverDistance = serializedObject.FindProperty("frontFlankCritRateAddOverDistance");
+        _serializedleftFlankHitRateAddOverDistance = serializedObject.FindProperty("leftFlankHitRateAddOverDistance");
+        _serializedleftFlankCritRateAddOverDistance = serializedObject.FindProperty("leftFlankCritRateAddOverDistance");
+        _serializedrightFlankHitRateAddOverDistance = serializedObject.FindProperty("rightFlankHitRateAddOverDistance");
+        _serializedrightFlankCritRateAddOverDistance = serializedObject.FindProperty("rightFlankCritRateAddOverDistance");
+        _serializedrearFlankHitRateAddOverDistance = serializedObject.FindProperty("rearFlankHitRateAddOverDistance");
+        _serializedrearFlankCritRateAddOverDistance = serializedObject.FindProperty("rearFlankCritRateAddOverDistance");
     }
 
     public override void OnInspectorGUI()
@@ -65,13 +93,11 @@ public class MechTypeEditor : Editor
         serializedObject.Update();
         var mech_type = (MechType)target;
 
-
         EditorGUILayout.PropertyField(_serialiedMaxHealth);
         EditorGUILayout.PropertyField(_serialiedSightRange);
         EditorGUILayout.PropertyField(_serialiedHearingRange);
         EditorGUILayout.PropertyField(_serialiedWeaponArray);
 
-        // Selection Algorithm setter
         int new_selection_index = EditorGUILayout.Popup("Targeting Algorithm", _selectedAlgorithmIndex, _selectionAlgorithmNames);
         if (new_selection_index != _selectedAlgorithmIndex)
         {
@@ -87,7 +113,7 @@ public class MechTypeEditor : Editor
             }
         }
 
-        if (_isShowingAgentProperties = EditorGUILayout.Foldout(_isShowingAgentProperties, "Physics & Navigation"))
+        if (_isShowingAgentProperties = EditorGUILayout.Foldout(_isShowingAgentProperties, "PHSYSICS & NAVIGATION"))
         {
             EditorGUILayout.PropertyField(_serializedSpeed);
             EditorGUILayout.PropertyField(_serializedAngularSpeed);
@@ -100,7 +126,37 @@ public class MechTypeEditor : Editor
             EditorGUILayout.PropertyField(_serialiedDrag);
             EditorGUILayout.PropertyField(_serialiedAngularDrag);
         }
-
+        
+        // TODO look up indentations in Unity Editory and Labels
+        if (_isShowingCurves = EditorGUILayout.Foldout(_isShowingCurves, "CURVES"))
+        {
+            if (_isShowingSpeedCurves = EditorGUILayout.Foldout(_isShowingSpeedCurves, "SPEED CURVES"))
+            {
+                EditorGUILayout.PropertyField(_serializedhitRateReductionOverSpeed);
+                EditorGUILayout.PropertyField(_serializeddamageReductionOverSpeed);
+                EditorGUILayout.PropertyField(_serializedcritRateReductionOverSpeed);
+            }
+            if (_isShowingFrontFlankCurves = EditorGUILayout.Foldout(_isShowingFrontFlankCurves, "FRONT FLANK CURVES"))
+            {
+                EditorGUILayout.PropertyField(_serializedfrontFlankHitRateAddOverDistance);
+                EditorGUILayout.PropertyField(_serializedfrontFlankCritRateAddOverDistance);
+            }
+            if (_isShowingLeftFlankCurves = EditorGUILayout.Foldout(_isShowingLeftFlankCurves, "LEFT FLANK CURVES"))
+            {
+                EditorGUILayout.PropertyField(_serializedleftFlankHitRateAddOverDistance);
+                EditorGUILayout.PropertyField(_serializedleftFlankCritRateAddOverDistance);
+            }
+            if (_isShowingRightFlankCurves = EditorGUILayout.Foldout(_isShowingRightFlankCurves, "RIGHT FLANK CURVES"))
+            {
+                EditorGUILayout.PropertyField(_serializedrightFlankHitRateAddOverDistance);
+                EditorGUILayout.PropertyField(_serializedrightFlankCritRateAddOverDistance);
+            }
+            if (_isShowingRearFlankCurves = EditorGUILayout.Foldout(_isShowingRearFlankCurves, "REAR FLANK CURVES"))
+            {
+                EditorGUILayout.PropertyField(_serializedrearFlankHitRateAddOverDistance);
+                EditorGUILayout.PropertyField(_serializedrearFlankCritRateAddOverDistance);
+            }
+        }
         if (serializedObject.ApplyModifiedProperties())
         {
             // propogate changes as needed   

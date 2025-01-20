@@ -6,6 +6,10 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "MechType_new_mech_type_name", menuName = "MechType")]
 public class MechType : ScriptableObject
 {
+    // ===================
+    // ===== STATICS =====
+    // ===================
+
     /// <summary>
     /// A generic delegate to be used as the function template for all mech slection algorithmns
     /// </summary>
@@ -13,46 +17,145 @@ public class MechType : ScriptableObject
     /// <returns></returns>
     public delegate BaseMech SelectionAlgorithm(BaseMech selector, params BaseMech[] mechs);
 
+    // ==================
+    // ===== COMBAT =====
+    // ==================
+
     /// <summary>
     /// The max health of this mech
     /// </summary>
-    public float maxHealth;
+    public float maxHealth = 100f;
 
     /// <summary>
-    /// A struct for wrapping CapsuleCollider and NavMeshAgent information
+    /// A list of all the weapons this mech has as Types
+    /// </summary>
+    public WeaponScriptable[] weapons = default;
+
+    // ==================================
+    // ===== PHYSICS AND NAVIGATION =====
+    // ==================================
+
+    /// <summary>
+    /// meters/second speed. For navigation and physics
     /// </summary>
     public float speed = 15f;
+
+    /// <summary>
+    /// degrees/second. For navigation
+    /// </summary>
     public float angularSpeed = 120f;
+
+    /// <summary>
+    /// meters/(second^2). For naviation and physics
+    /// </summary>
     public float acceleration = .3f;
+
+    /// <summary>
+    /// meters. For Navigation
+    /// </summary>
     public float stoppingDistance = 3f;
+
+    /// <summary>
+    /// Whether the mech will attempt to break in time to come to a stop at the destination
+    /// </summary>
     public bool autoBraking = true;
+
+    /// <summary>
+    /// meters. The size of the mech's capsule collider. For naviation and physics
+    /// </summary>
     public float radius = 2f;
+
+    /// <summary>
+    /// m/s speed. For navigation and physics
+    /// </summary>
     public float height = 5f;
 
     /// <summary>
     /// The RigidBody.mass of this mech
     /// </summary>
-    public float mass;
+    public float mass = 300f;
 
     /// <summary>
     /// The RigidBody.drag of this mech
     /// </summary>
-    public float drag;
+    public float drag = 3f;
 
     /// <summary>
     /// The RigidBody.angularDrag of this mech
     /// </summary>
-    public float angularDrag;
+    public float angularDrag = 3f;
+
+    // ===== SPEED CURVES =====
 
     /// <summary>
-    /// How far enemies can be seen by this mech (draws immediate aggro)
+    /// Yields hit rate reduction (eg. dodge chance) of this mech at a given speed (meters/second)
+    /// Must yield a negative value to be a reduction
     /// </summary>
-    public float sightRange;
+    public AnimationCurve hitRateReductionOverSpeed = default;
 
     /// <summary>
-    /// How far enemies can be heard by this mech (makes the mech divert from patrol, no immediate aggro)
+    /// Yields the (%) damage mitagation of this mech at a given speed (meters/second).
+    /// Must yield a negative value to be a reduction
     /// </summary>
-    public float hearingRange;
+    public AnimationCurve damageReductionOverSpeed = default;
+
+    /// <summary>
+    /// Yields the critical hit rate reduction of this mech at a given speed (meters/second)
+    /// Must yield a negative value to be a reduction
+    /// </summary>
+    public AnimationCurve critRateReductionOverSpeed = default;
+
+    // ===== FLANK CURVES =====
+
+    /// <summary>
+    /// Yields hit rate addition of this mech at a given distance (meters)
+    /// Must yield a negative value to be a reduction
+    /// </summary>
+    public AnimationCurve frontFlankHitRateAddOverDistance = default;
+
+    /// <summary>
+    /// Yields crit rate addition of this mech at a given distance (meters)
+    /// Must yield a negative value to be a reduction
+    /// </summary>
+    public AnimationCurve frontFlankCritRateAddOverDistance = default;
+    
+    /// <summary>
+    /// Yields hit rate addition of this mech at a given distance (meters)
+    /// Must yield a negative value to be a reduction
+    /// </summary>
+    public AnimationCurve leftFlankHitRateAddOverDistance = default;
+
+    /// <summary>
+    /// Yields crit rate addition of this mech at a given distance (meters)
+    /// Must yield a negative value to be a reduction
+    /// </summary>
+    public AnimationCurve leftFlankCritRateAddOverDistance = default;
+    /// <summary>
+    /// Yields hit rate addition of this mech at a given distance (meters)
+    /// Must yield a negative value to be a reduction
+    /// </summary>
+    public AnimationCurve rightFlankHitRateAddOverDistance = default;
+
+    /// <summary>
+    /// Yields crit rate addition of this mech at a given distance (meters)
+    /// Must yield a negative value to be a reduction
+    /// </summary>
+    public AnimationCurve rightFlankCritRateAddOverDistance = default;
+    /// <summary>
+    /// Yields hit rate addition of this mech at a given distance (meters)
+    /// Must yield a negative value to be a reduction
+    /// </summary>
+    public AnimationCurve rearFlankHitRateAddOverDistance = default;
+
+    /// <summary>
+    /// Yields crit rate addition of this mech at a given distance (meters)
+    /// Must yield a negative value to be a reduction
+    /// </summary>
+    public AnimationCurve rearFlankCritRateAddOverDistance = default;
+
+    // ==============
+    // ===== AI =====
+    // ==============
 
     /// <summary>
     /// How the unit chooses an enemy target
@@ -60,9 +163,14 @@ public class MechType : ScriptableObject
     public SelectionAlgorithm selectionAlg = SelectionAlg.Closest;
 
     /// <summary>
-    /// A list of all the weapons this mech has as Types
+    /// How far enemies can be seen by this mech (draws immediate aggro)
     /// </summary>
-    public WeaponScriptable[] weapons;
+    public float sightRange = 50f;
+
+    /// <summary>
+    /// How far enemies can be heard by this mech (makes the mech divert from patrol, no immediate aggro)
+    /// </summary>
+    public float hearingRange = 100f;
 }
 
 /// <summary>

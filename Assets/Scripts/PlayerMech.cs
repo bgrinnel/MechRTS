@@ -6,7 +6,11 @@ using System.ComponentModel.Design;
 // [ExecuteInEditMode]
 public class PlayerMech : BaseMech
 {
-    private bool _playerSetTarget;
+    // private bool _playerSetTarget; // TODO see if this is still needed
+    
+    /// <summary>
+    /// The visual element that shows a unit is selected 
+    /// </summary>
     private MeshRenderer _selectionPulse;
 
     /// <summary>
@@ -188,7 +192,7 @@ public class PlayerMech : BaseMech
     public override void OnTargetDeath(TCombatContext context)
     {
         base.OnTargetDeath(context);
-        _playerSetTarget = false;
+        // _playerSetTarget = false;
     }
 
     /// <summary>
@@ -217,6 +221,6 @@ public class PlayerMech : BaseMech
     {
         if (CurrentState == TState.Dead) return;
         SetTarget(target);
-        _playerSetTarget = true;
+        // _playerSetTarget = true;
     }
 }
