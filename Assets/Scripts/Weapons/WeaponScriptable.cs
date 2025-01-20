@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-//using UnityEditor.SearchService;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "New Weapon", menuName = "WeaponStats")]
@@ -8,6 +5,16 @@ public class WeaponScriptable : ScriptableObject
 {
     public enum WeaponType { Kenetic, Missile, Area, DirectEffect }
     public WeaponType weaponType = WeaponType.Kenetic;
+
+    public AnimationCurve accuracyOverRange;
+    public AnimationCurve damagePercentageOverRange;
+    public AnimationCurve damageMitigationOverTargetSpeed;
+    public AnimationCurve hitChanceOverSpeed;
+
+    [Range(0f,360f)]
+    public float weaponArcDegrees;
+
+    
     public float weaponRange;
     public float weaponDamage;
     public float weaponSalvoReload;

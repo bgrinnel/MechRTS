@@ -144,7 +144,12 @@ public class Weapon : MonoBehaviour
 
     private void DirectEffect(GameObject target)
     {
-        owningMech.HitMech(target.gameObject.GetComponent<BaseMech>(), weaponDamage);
+        // CoverType[] covers_in_fire;
+
+        // TODO: raycast to see what cover we would hit with a shot, multiple weighted casts if needed
+        // append those cover objects and weights to the 
+
+        owningMech.HitMech(target.gameObject.GetComponent<BaseMech>(), weaponStats); // TODO: add the ability to process an array of coverTypes to the end of HitMech()
     }
 
     private void Area()

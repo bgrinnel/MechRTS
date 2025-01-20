@@ -1,3 +1,4 @@
+using UnityEditor.UIElements;
 using UnityEngine;
 
 /// <summary>
@@ -7,10 +8,14 @@ using UnityEngine;
 /// </summary>
 public class CombatBehaviour : MonoBehaviour
 {
+    /// <summary>
+    /// Defines the method signature for an effect in the CriticalHitTable
+    /// </summary>
+    public delegate void CriticalHitEffect(BaseMech hitMech);
     
-    public delegate void Message(TCombatContext context);
+    public delegate void PostEvent(TCombatContext context);
 
-    public delegate void AgentMessage(CombatBehaviour agent, TCombatContext context);
+    public delegate void AgentPostEvent(CombatBehaviour agent, TCombatContext context);
 
     /// <summary>
     /// The base delegate definition for all CombatProperty related events, allows for modification of the property
@@ -24,6 +29,7 @@ public class CombatBehaviour : MonoBehaviour
     /// </summary>
    public static void CombatEvent(CombatBehaviour instigator, CombatBehaviour target, TCombatContext context)
    {
+        // TODO: wire in all our new mech curves
         if (target == null) return;
         var target_health = target.GetHealth();
         if (target_health.current <= target_health.min) return;
@@ -31,38 +37,67 @@ public class CombatBehaviour : MonoBehaviour
         context.instigator = instigator;
         context.target = target;
 
+        float fire_distance = Vector3.Distance(instigator.transform.position, target.transform.position);
+        WeaponScriptable instigator_weapon = context.weaponType;
+        MechType insitigator_type = instigator.owningMech.MechType;
+        MechType target_type = target.owningMech.MechType;
+
+        // calcuate hit chance
+        float hit_chance = instigator_weapon.accuracyOverRange.Evaluate(fire_distance);
+        float target_velocity = target.owningMech.Velocity;
+        hit_chance += target_type.hitRateReductionOverSpeed.Evaluate(target.owningMech.Velocity); // this is expected to be negative
+        
+        AnimationCurve flankHitRateOverDistance;
         var hitDirection = (instigator.transform.position - target.transform.position).normalized;
+        if (Vector3.Dot(hitDirection, target.transform.forward) > 0.5f)         // Front
+        {
+            flankHitRateOverDistance = target_type.frontFlankHitRateAddOverDistance;
+        }
+        else if (Vector3.Dot(hitDirection, -target.transform.forward) > 0.5f)   // Back
+        {
+            flankHitRateOverDistance = target_type.rearFlankHitRateAddOverDistance;
+            // Debug.Log("Hit on Back Armor");
+        }
+        else if (Vector3.Dot(hitDirection, target.transform.right) > 0.5f)      // Right side
+        {
+            flankHitRateOverDistance = target_type.rightFlankHitRateAddOverDistance;
+            // Debug.Log("Hit on Right Side Armor");
+        }
+        else// (Vector3.Dot(hitDirection, -target.transform.right) > 0.5f)     // Left side
+        {
+            flankHitRateOverDistance = target_type.leftFlankHitRateAddOverDistance;
+            // Debug.Log("Hit on Left Side Armor");
+        }
+        if (Vector3.Dot(hitDirection, target.transform.up) > 0.5f)         // Top, non-exculsive to the other angles (for now)
+        {
+            // Debug.Log("Hit on Top Armor");
+        }
+        hit_chance += flankHitRateOverDistance.Evaluate(fire_distance);
+        // hit_chance += context.weaponType.hitChanceOverSpeed() // TODO: continue
 
-        if (Vector3.Dot(hitDirection, target.transform.forward) > 0.5f) // Front
-        {
-            Debug.Log("Hit on Front Armor");
-        }
+        // TODO: process coverType's in an array within 'context'
 
-        else if (Vector3.Dot(hitDirection, -target.transform.forward) > 0.5f) // Back
-        {
-            Debug.Log("Hit on Back Armor");
-        }
-        else if (Vector3.Dot(hitDirection, target.transform.right) > 0.5f) // Right side
-        {
-            Debug.Log("Hit on Right Side Armor");
-        }
-        else if (Vector3.Dot(hitDirection, -target.transform.right) > 0.5f) // Left side
-        {
-            Debug.Log("Hit on Left Side Armor");
-        }
-        else if (Vector3.Dot(hitDirection, target.transform.up) > 0.5f) // Top
-        {
-            Debug.Log("Hit on Top Armor");
-        }
+        // roll hit chance
+        if (Random.Range(0f, 100f) < hit_chance) // SUCCESSFUL HIT
+        {   
+            float damage = context.weaponType.weaponDamage;
 
-        target_health.current -= context.damage.current;
-        target_health = target.SetHealth(target_health.current,  context);
-        // Debug.Log($"{target.gameObject.name}'s Health fell to {target_health.current}");
-        if (target_health.current <= target_health.min)
-        {
-            if (instigator != null) instigator.defeatedAgent?.Invoke(target, context);
-            target.death?.Invoke(context);
+            // TODO: process a crit table of effects and crit chance
+
+            target_health.current -= damage;
+            target_health = target.SetHealth(target_health.current,  context);
+            // Debug.Log($"{target.gameObject.name}'s Health fell to {target_health.current}");
+            if (target_health.current <= target_health.min)
+            {
+                if (instigator != null) instigator.defeatedAgent?.Invoke(target, context);
+                target.death?.Invoke(context);
+            }
         }
+        else                                    // MISSED
+        {
+
+        }
+        
    }
    
     /// <summary>
@@ -78,19 +113,24 @@ public class CombatBehaviour : MonoBehaviour
     /// <summary>
     /// Invoked by static CombatBehaviour.CombatEvent() when this CombatBehaviour's Health reaches min
     /// </summary>
-    public Message death;
+    public PostEvent death;
 
     /// <summary>
     /// Invoked by static CombatBehaviour.CombatEvent() when this CombatBehaviour instigates a combat event that kills "agent"
     /// Invoked before "agent"'s Death invokation
     /// </summary>
-    public AgentMessage defeatedAgent;
+    public AgentPostEvent defeatedAgent;
 
     private TPropertyContainer _healthContainer;
+
+    // component references
+    private BaseMech owningMech;
 
     public void Initialize(float maxHealth)
     {
         _healthContainer = new TPropertyContainer(maxHealth);
+        owningMech = GetComponent<BaseMech>();
+        if (owningMech == null) Debug.LogError("CombatBehavior doesn't have a supporting BaseMech component within its parent object");
     }
     
     public TPropertyContainer GetHealth() { return _healthContainer; }

@@ -47,6 +47,8 @@ public abstract class BaseMech : MonoBehaviour
 
     private float _scaledRadius;
     private float _scaledHalfHeight;
+    private float _velocity;
+    private Vector3 _positionLastFrame;
 
     private Weapon[] _weapons;
 
@@ -148,6 +150,11 @@ public abstract class BaseMech : MonoBehaviour
     /// </summary>
     public bool IsPlayerMech => _isPlayer;
 
+    /// <summary>
+    /// The velocity of this mech based on its position last frame minus its position this frame
+    /// </summary>
+    public float Velocity => _velocity;
+
     /********************
     *     EVENTS       *
     ********************/
@@ -236,6 +243,8 @@ public abstract class BaseMech : MonoBehaviour
         _timeTillAggro = 5f;
         _scaledRadius = _type.radius * Mathf.Max(transform.localScale.x, transform.localScale.z); // take the largest to be safe
         _scaledHalfHeight = _type.height * transform.localScale.y / 2f - _scaledRadius;
+        _positionLastFrame = transform.position;
+        _velocity = 0f;
     }
     
     /// <summary>
@@ -245,6 +254,9 @@ public abstract class BaseMech : MonoBehaviour
 
     private void Update()
     {
+        _velocity = (_positionLastFrame - transform.position).magnitude;
+        _positionLastFrame = transform.position;
+        
         _currentStateDurationSeconds += Time.deltaTime;
         if (_currentState == TState.Dead) return;
         
@@ -543,9 +555,9 @@ public abstract class BaseMech : MonoBehaviour
     /// <summary>
     /// How to deal damage if you don't want to have to look at CombatBehaviour
     /// </summary>
-    public void HitMech(BaseMech mech, float damage)
+    public void HitMech(BaseMech mech, WeaponScriptable weaponType)
     {
-        CombatBehaviour.CombatEvent(_combatBehaviour, mech._combatBehaviour, TCombatContext.BasicAttack(damage));
+        CombatBehaviour.CombatEvent(_combatBehaviour, mech._combatBehaviour, TCombatContext.BasicAttack(weaponType));
     }
 }
 

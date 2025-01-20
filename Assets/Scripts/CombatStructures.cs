@@ -45,12 +45,22 @@ public struct TCombatContext
     public TPropertyContainer damage;
     public CombatBehaviour instigator;
     public CombatBehaviour target;
-    static public TCombatContext BasicAttack(float Damage)
+    public WeaponScriptable weaponType;
+    static public TCombatContext BasicAttack(WeaponScriptable weaponType)
     {
         return new TCombatContext{
-            damage = new TPropertyContainer{max=float.MaxValue, current=Damage, min=float.MinValue}
+            damage = new TPropertyContainer{max=float.MaxValue, current=weaponType.weaponDamage, min=float.MinValue},
+            weaponType = weaponType
         };
     }
+
+    // TODO: reimplement this if needed, wanted to make sure everyone switched over to passing the full weaponType first tho 
+    // static public TCombatContext BasicAttack(float damage, float damageMin = float.MinValue, float damageMax = float.MaxValue)
+    // {
+    //     return new TCombatContext{
+    //         damage = new TPropertyContainer{max=damageMax, current=damage, min=damageMin}
+    //     };
+    // }
 }
 
 public struct TState
